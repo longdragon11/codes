@@ -10,65 +10,59 @@
 #BiocManager::install("enrichplot")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library("clusterProfiler")
 library("org.Hs.eg.db")
 library("enrichplot")
 library("ggplot2")
 
-pvalueFilter=0.05      #pÖµ¹ıÂËÌõ¼ş
-adjPvalFilter=1        #½ÃÕıºóµÄpÖµ¹ıÂËÌõ¼ş
+pvalueFilter=0.05      #på€¼è¿‡æ»¤æ¡ä»¶
+adjPvalFilter=1        #çŸ«æ­£åçš„på€¼è¿‡æ»¤æ¡ä»¶
 
-#¶¨ÒåÍ¼ĞÎµÄÑÕÉ«
+#å®šä¹‰å›¾å½¢çš„é¢œè‰²
 colorSel="p.adjust"
 if(adjPvalFilter>0.05){
 	colorSel="pvalue"
 }
 
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\13.KEGG")      #ÉèÖÃ¹¤×÷Ä¿Â¼
-rt=read.table("interGenes.txt", header=F, sep="\t", check.names=F)     #¶ÁÈ¡½»¼¯»ùÒòµÄÁĞ±íÎÄ¼ş
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\13.KEGG")      #è®¾ç½®å·¥ä½œç›®å½•
+rt=read.table("interGenes.txt", header=F, sep="\t", check.names=F)     #è¯»å–äº¤é›†åŸºå› çš„åˆ—è¡¨æ–‡ä»¶
 
-#ÌáÈ¡»ùÒòµÄÃû³Æ, ½«»ùÒòÃû³Æ×ª»»Îª»ùÒòid
+#æå–åŸºå› çš„åç§°, å°†åŸºå› åç§°è½¬æ¢ä¸ºåŸºå› id
 genes=unique(as.vector(rt[,1]))
 entrezIDs=mget(genes, org.Hs.egSYMBOL2EG, ifnotfound=NA)
 entrezIDs=as.character(entrezIDs)
 rt=cbind(rt, entrezIDs)
 colnames(rt)[1]="gene"
-rt=rt[rt[,"entrezIDs"]!="NA",]      #È¥³ı»ùÒòidÎªNAµÄ»ùÒò
+rt=rt[rt[,"entrezIDs"]!="NA",]      #å»é™¤åŸºå› idä¸ºNAçš„åŸºå› 
 gene=rt$entrezID
 #gene=gsub("c\\(\"(\\d+)\".*", "\\1", gene)
 
-#kegg¸»¼¯·ÖÎö
+#keggå¯Œé›†åˆ†æ
 kk <- enrichKEGG(gene=gene, organism="hsa", pvalueCutoff=1, qvalueCutoff=1)
 kk@result$Description=gsub(" - Homo sapiens \\(human\\)", "", kk@result$Description)
 KEGG=as.data.frame(kk)
 KEGG$geneID=as.character(sapply(KEGG$geneID,function(x)paste(rt$gene[match(strsplit(x,"/")[[1]],as.character(rt$entrezID))],collapse="/")))
 KEGG=KEGG[(KEGG$pvalue<pvalueFilter & KEGG$p.adjust<adjPvalFilter),]
-#Êä³öÏÔÖø¸»¼¯µÄ½á¹û
+#è¾“å‡ºæ˜¾è‘—å¯Œé›†çš„ç»“æœ
 write.table(KEGG, file="KEGG.txt", sep="\t", quote=F, row.names = F)
 
-#ÉèÖÃÕ¹Ê¾Í¨Â·µÄÊıÄ¿
+#è®¾ç½®å±•ç¤ºé€šè·¯çš„æ•°ç›®
 showNum=30
 if(nrow(KEGG)<showNum){
 	showNum=nrow(KEGG)
 }
 
-#Öù×´Í¼
+#æŸ±çŠ¶å›¾
 pdf(file="barplot.pdf", width=8.5, height=7)
 barplot(kk, drop=TRUE, showCategory=showNum, label_format=100, color=colorSel)
 dev.off()
 
-#ÆøÅİÍ¼
+#æ°”æ³¡å›¾
 pdf(file="bubble.pdf", width=8.5, height=7)
 dotplot(kk, showCategory=showNum, orderBy="GeneRatio", label_format=100, color=colorSel)
 dev.off()
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

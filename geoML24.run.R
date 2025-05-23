@@ -5,25 +5,17 @@
 #BiocManager::install("preprocessCore")
 
 
-inputFile="merge.normalize.txt"      #ÊäÈëÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\24.CIBERSORT")      #ÉèÖÃ¹¤×÷Ä¿Â¼
-source("geoML24.CIBERSORT.R")       #ÒıÓÃ°ü
+inputFile="merge.normalize.txt"      #è¾“å…¥æ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\24.CIBERSORT")      #è®¾ç½®å·¥ä½œç›®å½•
+source("geoML24.CIBERSORT.R")       #å¼•ç”¨åŒ…
 
-#ÃâÒßÏ¸°û½şÈó·ÖÎö
+#å…ç–«ç»†èƒæµ¸æ¶¦åˆ†æ
 outTab=CIBERSORT("ref.txt", inputFile, perm=1000)
 
-#¶ÔÃâÒß½şÈó½á¹û¹ıÂË£¬²¢ÇÒ±£´æÃâÒßÏ¸°û½şÈó½á¹û
+#å¯¹å…ç–«æµ¸æ¶¦ç»“æœè¿‡æ»¤ï¼Œå¹¶ä¸”ä¿å­˜å…ç–«ç»†èƒæµ¸æ¶¦ç»“æœ
 outTab=outTab[outTab[,"P-value"]<0.05,]
 outTab=as.matrix(outTab[,1:(ncol(outTab)-3)])
 outTab=rbind(id=colnames(outTab),outTab)
 write.table(outTab, file="CIBERSORT-Results.txt", sep="\t", quote=F, col.names=F)
-
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

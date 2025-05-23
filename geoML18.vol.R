@@ -2,25 +2,25 @@
 #install.packages("ggrepel")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(dplyr)
 library(ggplot2)
 library(ggrepel)
 
-logFCfilter=0.585              #logFC¹ıÂËÌõ¼ş
-adj.P.Val.Filter=0.05          #½ÃÕıºóµÄpÖµ¹ıÂËÌõ¼ş
-diffFile="all.txt"             #ËùÓĞ»ùÒò²îÒì·ÖÎöµÄ½á¹ûÎÄ¼ş
-geneFile="model.genes.txt"     #Ä£ĞÍ»ùÒòµÄÎÄ¼ş
-method="glmBoost+RF"           #Ñ¡Ôñ»úÆ÷Ñ§Ï°µÄ·½·¨(ĞèÒª¸ù¾İÈÈÍ¼½øĞĞĞŞ¸Ä)
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\18.vol")       #ÉèÖÃ¹¤×÷Ä¿Â¼
+logFCfilter=0.585              #logFCè¿‡æ»¤æ¡ä»¶
+adj.P.Val.Filter=0.05          #çŸ«æ­£åçš„på€¼è¿‡æ»¤æ¡ä»¶
+diffFile="all.txt"             #æ‰€æœ‰åŸºå› å·®å¼‚åˆ†æçš„ç»“æœæ–‡ä»¶
+geneFile="model.genes.txt"     #æ¨¡å‹åŸºå› çš„æ–‡ä»¶
+method="glmBoost+RF"           #é€‰æ‹©æœºå™¨å­¦ä¹ çš„æ–¹æ³•(éœ€è¦æ ¹æ®çƒ­å›¾è¿›è¡Œä¿®æ”¹)
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\18.vol")       #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡²îÒì·ÖÎöµÄ½á¹ûÎÄ¼ş
+#è¯»å–å·®å¼‚åˆ†æçš„ç»“æœæ–‡ä»¶
 rt=read.table(diffFile, header=T, sep="\t", check.names=F)
 row.names(rt)=rt[,1]
-#¶¨ÒåÏÔÖøĞÔ
+#å®šä¹‰æ˜¾è‘—æ€§
 Sig=ifelse((rt$adj.P.Val<adj.P.Val.Filter) & (abs(rt$logFC)>logFCfilter), ifelse(rt$logFC>logFCfilter,"Up","Down"), "Not")
 
-#»æÖÆ»ğÉ½Í¼
+#ç»˜åˆ¶ç«å±±å›¾
 rt = mutate(rt, Sig=Sig)
 p = ggplot(rt, aes(logFC, -log10(adj.P.Val)))+
     geom_point(aes(col=Sig))+
@@ -28,7 +28,7 @@ p = ggplot(rt, aes(logFC, -log10(adj.P.Val)))+
     labs(title = " ")+
     theme(plot.title = element_text(size=16, hjust=0.5, face = "bold"))
 
-#ÔÚÍ¼ĞÎÖĞ±ê×¢ÌØÕ÷»ùÒòµÄÃû³Æ
+#åœ¨å›¾å½¢ä¸­æ ‡æ³¨ç‰¹å¾åŸºå› çš„åç§°
 geneRT=read.table(geneFile, header=T, sep="\t", check.names=F)
 geneRT=geneRT[geneRT$algorithm==method,]
 sameGene=intersect(as.vector(geneRT[,1]), row.names(rt))
@@ -36,22 +36,15 @@ showData=rt[sameGene,]
 p1=p+geom_label_repel(data=showData,
                     box.padding=0.2, point.padding=0.2, min.segment.length=0.1,
                     size=3, aes(label=id)) + theme_bw()
-#Êä³öÍ¼ĞÎ
+#è¾“å‡ºå›¾å½¢
 pdf(file="vol.pdf", width=5.25, height=4.5)
 print(p1)
 dev.off()
 
-#Êä³ö×îÓÅÄ£ĞÍ»ùÒòµÄÁĞ±í
+#è¾“å‡ºæœ€ä¼˜æ¨¡å‹åŸºå› çš„åˆ—è¡¨
 write.table(sameGene, file="modelGene.list.txt", sep="\t", quote=F, row.names=F, col.names=F)
-#Êä³ö×îÓÅÄ£ĞÍ»ùÒòµÄ²îÒìÇé¿ö
+#è¾“å‡ºæœ€ä¼˜æ¨¡å‹åŸºå› çš„å·®å¼‚æƒ…å†µ
 write.table(showData, file="modelGene.diff.txt", sep="\t", quote=F, row.names=F)
 
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

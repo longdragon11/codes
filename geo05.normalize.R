@@ -3,16 +3,16 @@
 #BiocManager::install("limma")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 
-inputFile="geneMatrix.txt"     #±í´ïÊı¾İÎÄ¼ş
-conFile="s1.txt"               #¶ÔÕÕ×éµÄÑùÆ·ĞÅÏ¢ÎÄ¼ş
-treatFile="s2.txt"             #ÊµÑé×éµÄÑùÆ·ĞÅÏ¢ÎÄ¼ş
-geoID="GSE54563"                #GEOÊı¾İ¿âÑĞ¾¿µÄid
-setwd("C:\\Users\\19809\\Desktop\\MR\\»ùÒò½ÃÕı\\GSE54563")      #ÉèÖÃ¹¤×÷Ä¿Â¼
+inputFile="geneMatrix.txt"     #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+conFile="s1.txt"               #å¯¹ç…§ç»„çš„æ ·å“ä¿¡æ¯æ–‡ä»¶
+treatFile="s2.txt"             #å®éªŒç»„çš„æ ·å“ä¿¡æ¯æ–‡ä»¶
+geoID="GSE54563"                #GEOæ•°æ®åº“ç ”ç©¶çš„id
+setwd("C:\\Users\\19809\\Desktop\\MR\\åŸºå› çŸ«æ­£\\GSE54563")      #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡ÊäÈëÎÄ¼ş£¬²¢¶ÔÊäÈëÎÄ¼şÕûÀí
+#è¯»å–è¾“å…¥æ–‡ä»¶ï¼Œå¹¶å¯¹è¾“å…¥æ–‡ä»¶æ•´ç†
 rt=read.table(inputFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -21,7 +21,7 @@ dimnames=list(rownames(exp),colnames(exp))
 data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 rt=avereps(data)
 
-#Èç¹ûÊı¾İÃ»ÓĞÈ¡log2, »á¶ÔÊı¾İ×Ô¶¯È¡log2
+#å¦‚æœæ•°æ®æ²¡æœ‰å–log2, ä¼šå¯¹æ•°æ®è‡ªåŠ¨å–log2
 qx=as.numeric(quantile(rt, c(0, 0.25, 0.5, 0.75, 0.99, 1.0), na.rm=T))
 LogC=( (qx[5]>100) || ( (qx[6]-qx[1])>50 && qx[2]>0) )
 if(LogC){
@@ -29,7 +29,7 @@ if(LogC){
 	rt=log2(rt+1)}
 data=normalizeBetweenArrays(rt)
 
-#¶ÁÈ¡ÑùÆ·ĞÅÏ¢µÄÎÄ¼ş(¶ÔÕÕ×éºÍÊµÑé×é)
+#è¯»å–æ ·å“ä¿¡æ¯çš„æ–‡ä»¶(å¯¹ç…§ç»„å’Œå®éªŒç»„)
 sample1=read.table(conFile, header=F, sep="\t", check.names=F)
 sample2=read.table(treatFile, header=F, sep="\t", check.names=F)
 sampleName1=gsub("^ | $", "", as.vector(sample1[,1]))
@@ -40,16 +40,11 @@ data=cbind(conData,treatData)
 conNum=ncol(conData)
 treatNum=ncol(treatData)
 
-#Êä³öËùÓĞ»ùÒò½ÃÕıºóµÄ±í´ïÁ¿
+#è¾“å‡ºæ‰€æœ‰åŸºå› çŸ«æ­£åçš„è¡¨è¾¾é‡
 Type=c(rep("Control",conNum),rep("Treat",treatNum))
 outData=rbind(id=paste0(colnames(data),"_",Type),data)
 write.table(outData,file=paste0(geoID,".normalize.txt"),sep="\t",quote=F,col.names=F)
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 

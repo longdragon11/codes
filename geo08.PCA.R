@@ -2,24 +2,24 @@
 #install.packages("ggpubr")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(ggplot2)
 library(ggpubr)
-setwd("C:\\Users\\19809\\Desktop\\MR\\pca")    #ÉèÖÃ¹¤×÷Ä¿Â¼
+setwd("C:\\Users\\19809\\Desktop\\MR\\pca")    #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶¨ÒåPCA·ÖÎöµÄº¯Êı
+#å®šä¹‰PCAåˆ†æçš„å‡½æ•°
 bioPCA=function(inputFile=null, outFile=null, titleName=null){
-	#¶ÁÈ¡ÊäÈëÎÄ¼ş,ÌáÈ¡Êı¾İ
+	#è¯»å–è¾“å…¥æ–‡ä»¶,æå–æ•°æ®
 	rt=read.table(inputFile, header=T, sep="\t", check.names=F, row.names=1)
 	data=t(rt)
-	Project=gsub("(.*?)\\_.*", "\\1", rownames(data))    #»ñÈ¡GEOÊı¾İ¿âÑĞ¾¿µÄid
+	Project=gsub("(.*?)\\_.*", "\\1", rownames(data))    #è·å–GEOæ•°æ®åº“ç ”ç©¶çš„id
 	
-	#PCA·ÖÎö
+	#PCAåˆ†æ
 	data.pca=prcomp(data)
 	pcaPredict=predict(data.pca)
 	PCA=data.frame(PC1=pcaPredict[,1], PC2=pcaPredict[,2], Type=Project)
 
-	#»æÖÆPCAµÄÍ¼ĞÎ
+	#ç»˜åˆ¶PCAçš„å›¾å½¢
 	pdf(file=outFile, width=5.5, height=4.25)
 	p1=ggscatter(data=PCA, x="PC1", y="PC2", color="Type", shape="Type", 
 	          ellipse=T, ellipse.type="norm", ellipse.border.remove=F, ellipse.alpha = 0.1,
@@ -29,17 +29,12 @@ bioPCA=function(inputFile=null, outFile=null, titleName=null){
 	dev.off()
 }
 
-#µ÷ÓÃº¯Êı, »æÖÆÅú´Î½ÃÕıÇ°µÄÍ¼ĞÎ
+#è°ƒç”¨å‡½æ•°, ç»˜åˆ¶æ‰¹æ¬¡çŸ«æ­£å‰çš„å›¾å½¢
 bioPCA(inputFile="merge.preNorm.txt", outFile="PCA.preNorm.pdf", titleName="Before batch correction")
-#µ÷ÓÃº¯Êı, »æÖÆÅú´Î½ÃÕıºóµÄÍ¼ĞÎ
+#è°ƒç”¨å‡½æ•°, ç»˜åˆ¶æ‰¹æ¬¡çŸ«æ­£åçš„å›¾å½¢
 bioPCA(inputFile="merge.normalize.txt", outFile="PCA.normalzie.pdf", titleName="After batch correction")
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 
 

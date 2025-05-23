@@ -7,19 +7,19 @@
 #install.packages("ggpubr")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(reshape2)
 library(ggpubr)
 library(limma)
 library(GSEABase)
 library(GSVA)
 
-gene="FIBP"      #»ùÒòµÄÃû³Æ(¸ù¾İÑĞ¾¿µÄÄ¿±ê»ùÒò½øĞĞĞŞ¸Ä)
-expFile="merge.normalize.txt"           #±í´ïÊı¾İÎÄ¼ş
-gmtFile="c2.cp.kegg.Hs.symbols.gmt"     #»ùÒò¼¯ÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\23.GSVA")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+gene="FIBP"      #åŸºå› çš„åç§°(æ ¹æ®ç ”ç©¶çš„ç›®æ ‡åŸºå› è¿›è¡Œä¿®æ”¹)
+expFile="merge.normalize.txt"           #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+gmtFile="c2.cp.kegg.Hs.symbols.gmt"     #åŸºå› é›†æ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\23.GSVA")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡±í´ïÊäÈëÎÄ¼ş,²¢¶ÔÊäÈëÎÄ¼şÕûÀí
+#è¯»å–è¡¨è¾¾è¾“å…¥æ–‡ä»¶,å¹¶å¯¹è¾“å…¥æ–‡ä»¶æ•´ç†
 rt=read.table(expFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -28,24 +28,24 @@ dimnames=list(rownames(exp),colnames(exp))
 data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 data=avereps(data)
 
-#È¥³ı¶ÔÕÕ×éµÄÑùÆ·
+#å»é™¤å¯¹ç…§ç»„çš„æ ·å“
 Type=gsub("(.*)\\_(.*)\\_(.*)", "\\3", colnames(data))
 data=data[,Type=="Treat",drop=F]
 
-#¶ÁÈ¡»ùÒò¼¯ÎÄ¼ş
+#è¯»å–åŸºå› é›†æ–‡ä»¶
 geneSets=getGmt(gmtFile, geneIdType=SymbolIdentifier())
 
-#GSVA·ÖÎö
+#GSVAåˆ†æ
 gsvaScore=gsva(data, geneSets, method='ssgsea', kcdf='Gaussian', abs.ranking=TRUE)
-#¶Ô´ò·Ö½øĞĞ½ÃÕı
+#å¯¹æ‰“åˆ†è¿›è¡ŒçŸ«æ­£
 normalize=function(x){
   return((x-min(x))/(max(x)-min(x)))}
 gsvaScore=normalize(gsvaScore)
 gsvaScore=gsvaScore[apply(gsvaScore,1,sd)>0.01,]
 
-#¸ù¾İÄ¿±ê»ùÒòµÄ±í´ïÁ¿¶ÔÑùÆ·½øĞĞ·Ö×é
-lowName=colnames(data)[data[gene,]<median(data[gene,])]       #µÍ±í´ï×éµÄÑùÆ·
-highName=colnames(data)[data[gene,]>=median(data[gene,])]     #¸ß±í´ï×éµÄÑùÆ·
+#æ ¹æ®ç›®æ ‡åŸºå› çš„è¡¨è¾¾é‡å¯¹æ ·å“è¿›è¡Œåˆ†ç»„
+lowName=colnames(data)[data[gene,]<median(data[gene,])]       #ä½è¡¨è¾¾ç»„çš„æ ·å“
+highName=colnames(data)[data[gene,]>=median(data[gene,])]     #é«˜è¡¨è¾¾ç»„çš„æ ·å“
 lowScore=gsvaScore[,lowName]
 highScore=gsvaScore[,highName]
 data=cbind(lowScore, highScore)
@@ -53,7 +53,7 @@ conNum=ncol(lowScore)
 treatNum=ncol(highScore)
 Type=c(rep("Control",conNum), rep("Treat",treatNum))
 
-#¶ÔÍ¨Â·½øĞĞÑ­»·, Í¨Â·²îÒì·ÖÎö
+#å¯¹é€šè·¯è¿›è¡Œå¾ªç¯, é€šè·¯å·®å¼‚åˆ†æ
 outTab=data.frame()
 for(i in row.names(data)){
 	test=t.test(data[i,] ~ Type)
@@ -73,7 +73,7 @@ if(nrow(sigTab)>20){
 	outTab=rbind(sigTab,notSigTab[c(1:5,((nrow(notSigTab)-4):nrow(notSigTab))),])
 }
 
-#»æÖÆÖù×´Í¼
+#ç»˜åˆ¶æŸ±çŠ¶å›¾
 pdf(file="barplot.pdf", width=10.5, height=7)
 outTab$t=as.numeric(outTab$t)
 outTab$Sig=factor(outTab$Sig, levels=c("Down", "Not", "Up"))
@@ -84,12 +84,5 @@ gg1=ggbarplot(outTab, x="Pathway", y="t", fill = "Sig", color = "white",
 print(gg1)
 dev.off()
 
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

@@ -1,42 +1,37 @@
 #install.packages("VennDiagram")
 
 
-library(VennDiagram)             #ÒıÓÃ°ü
-diffFile="diff.txt"              #²îÒì·ÖÎöµÄ½á¹ûÎÄ¼ş
-moduleFile="module_red.txt"      #Ä£¿é»ùÒòµÄÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\11.venn")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+library(VennDiagram)             #å¼•ç”¨åŒ…
+diffFile="diff.txt"              #å·®å¼‚åˆ†æçš„ç»“æœæ–‡ä»¶
+moduleFile="module_red.txt"      #æ¨¡å—åŸºå› çš„æ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\11.venn")     #è®¾ç½®å·¥ä½œç›®å½•
 geneList=list()
 
-#¶ÁÈ¡²îÒì·ÖÎöµÄ½á¹ûÎÄ¼ş
+#è¯»å–å·®å¼‚åˆ†æçš„ç»“æœæ–‡ä»¶
 rt=read.table("diff.txt", header=T, sep="\t", check.names=F)
-geneNames=as.vector(rt[,1])              #ÌáÈ¡²îÒì»ùÒòµÄÃû³Æ
-geneNames=gsub("^ | $","",geneNames)     #È¥µô»ùÒòÊ×Î²µÄ¿Õ¸ñ
-uniqGene=unique(geneNames)               #¶Ô²îÒì»ùÒòÈ¡unique
+geneNames=as.vector(rt[,1])              #æå–å·®å¼‚åŸºå› çš„åç§°
+geneNames=gsub("^ | $","",geneNames)     #å»æ‰åŸºå› é¦–å°¾çš„ç©ºæ ¼
+uniqGene=unique(geneNames)               #å¯¹å·®å¼‚åŸºå› å–unique
 geneList[["DEG"]]=uniqGene
 
-#¶ÁÈ¡Ä£¿é»ùÒòµÄÎÄ¼ş
+#è¯»å–æ¨¡å—åŸºå› çš„æ–‡ä»¶
 rt=read.table(moduleFile, header=F, sep="\t", check.names=F)
-geneNames=as.vector(rt[,1])              #ÌáÈ¡Ä£¿é»ùÒòµÄÃû³Æ
-geneNames=gsub("^ | $","",geneNames)     #È¥µô»ùÒòÊ×Î²µÄ¿Õ¸ñ
-uniqGene=unique(geneNames)               #¶ÔÄ£¿é»ùÒòÈ¡unique
+geneNames=as.vector(rt[,1])              #æå–æ¨¡å—åŸºå› çš„åç§°
+geneNames=gsub("^ | $","",geneNames)     #å»æ‰åŸºå› é¦–å°¾çš„ç©ºæ ¼
+uniqGene=unique(geneNames)               #å¯¹æ¨¡å—åŸºå› å–unique
 geneList[["WGCNA"]]=uniqGene
 
-#»æÖÆvennÍ¼
+#ç»˜åˆ¶vennå›¾
 venn.plot=venn.diagram(geneList,filename=NULL,fill=c("cornflowerblue", "darkorchid1"),scaled=FALSE,cat.pos=c(-1,1),cat.col = c("cornflowerblue", "darkorchid1"),cat.cex = 1.2)
 pdf(file="venn.pdf", width=5, height=5)
 grid.draw(venn.plot)
 dev.off()
 
-#Êä³ö½»¼¯»ùÒòµÄÁĞ±í
+#è¾“å‡ºäº¤é›†åŸºå› çš„åˆ—è¡¨
 interGenes=Reduce(intersect, geneList)
 write.table(interGenes, file="interGenes.txt", sep="\t", quote=F, col.names=F, row.names=F)
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: seqBio
+
 
 

@@ -3,18 +3,18 @@
 #install.packages("corrplot")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(reshape2)
 library(ggpubr)
 library(corrplot)
 
-inputFile="CIBERSORT-Results.txt"     #ÃâÒßÏ¸°û½şÈóµÄ½á¹ûÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\25.barplot")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+inputFile="CIBERSORT-Results.txt"     #å…ç–«ç»†èƒæµ¸æ¶¦çš„ç»“æœæ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\25.barplot")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡ÃâÒßÏ¸°û½şÈóÎÄ¼ş
+#è¯»å–å…ç–«ç»†èƒæµ¸æ¶¦æ–‡ä»¶
 rt=read.table(inputFile, header=T, sep="\t", check.names=F, row.names=1)
 
-#¶ÔÑùÆ·½øĞĞ·Ö×é(¶ÔÕÕ×éºÍÊµÑé×é)
+#å¯¹æ ·å“è¿›è¡Œåˆ†ç»„(å¯¹ç…§ç»„å’Œå®éªŒç»„)
 con=grepl("_Control", rownames(rt), ignore.case=T)
 treat=grepl("_Treat", rownames(rt), ignore.case=T)
 conData=rt[con,]
@@ -23,7 +23,7 @@ conNum=nrow(conData)
 treatNum=nrow(treatData)
 data=t(rbind(conData, treatData))
 
-#»æÖÆÖù×´Í¼
+#ç»˜åˆ¶æŸ±çŠ¶å›¾
 pdf(file="barplot.pdf", width=13, height=7)
 col=rainbow(nrow(data), s=0.7, v=0.7)
 par(las=1,mar=c(8,5,4,16),mgp=c(3,0.1,0),cex.axis=1.5)
@@ -31,10 +31,10 @@ a1=barplot(data,col=col,xaxt="n",yaxt="n",ylab="Relative Percent",cex.lab=1.5)
 a2=axis(2,tick=F,labels=F)
 axis(2,a2,paste0(a2*100,"%"))
 par(srt=0,xpd=T)
-#ÔÚÍ¼ĞÎÖĞ±ê×¢¶ÔÕÕ×éµÄÑùÆ·,ÓÃÂÌÉ«±íÊ¾
+#åœ¨å›¾å½¢ä¸­æ ‡æ³¨å¯¹ç…§ç»„çš„æ ·å“,ç”¨ç»¿è‰²è¡¨ç¤º
 rect(xleft = a1[1]-0.5, ybottom = -0.01, xright = a1[conNum]+0.5, ytop = -0.06,col="#008B45FF")
 text(a1[conNum]/2,-0.035,"Control",cex=1.8)
-#ÔÚÍ¼ĞÎÖĞ±ê×¢ÊµÑé×éµÄÑùÆ·,ÓÃºìÉ«±íÊ¾
+#åœ¨å›¾å½¢ä¸­æ ‡æ³¨å®éªŒç»„çš„æ ·å“,ç”¨çº¢è‰²è¡¨ç¤º
 rect(xleft = a1[conNum]+0.5, ybottom = -0.01, xright =a1[length(a1)]+0.5, ytop = -0.06,col="#EE0000FF")
 text((a1[length(a1)]+a1[conNum])/2,-0.035,"Treat",cex=1.8)
 ytick2 = cumsum(data[,ncol(data)])
@@ -42,13 +42,13 @@ ytick1 = c(0,ytick2[-length(ytick2)])
 legend(par('usr')[2]*0.98,par('usr')[4],legend=rownames(data),col=col,pch=15,bty="n",cex=1)
 dev.off()
 
-##################»æÖÆÏäÏßÍ¼##################
-#°ÑÊı¾İ×ª»»³Éggplot2ÊäÈëÎÄ¼ş
+##################ç»˜åˆ¶ç®±çº¿å›¾##################
+#æŠŠæ•°æ®è½¬æ¢æˆggplot2è¾“å…¥æ–‡ä»¶
 Type=gsub("(.*)\\_(.*)", "\\2", colnames(data))
 data=cbind(as.data.frame(t(data)), Type)
 data=melt(data, id.vars=c("Type"))
 colnames(data)=c("Type", "Immune", "Expression")
-#»æÖÆÏäÏßÍ¼
+#ç»˜åˆ¶ç®±çº¿å›¾
 group=levels(factor(data$Type))
 bioCol=c("#008B45FF","#EE0000FF","#0066FF","#FF0000","#6E568C","#7CC767","#223D6C","#D20A13","#FFD121","#088247","#11AA4D")
 bioCol=bioCol[1:length(group)]
@@ -61,30 +61,21 @@ boxplot=ggboxplot(data, x="Immune", y="Expression", fill="Type",
 				  palette=bioCol)+
 				  rotate_x_text(50)+
 	stat_compare_means(aes(group=Type),symnum.args=list(cutpoints=c(0, 0.001, 0.01, 0.05, 1), symbols=c("***", "**", "*", "")), label="p.signif")
-#Êä³öÏäÏßÍ¼
+#è¾“å‡ºç®±çº¿å›¾
 pdf(file="immune.diff.pdf", width=8, height=6)
 print(boxplot)
 dev.off()
 
-##################Ïà¹ØĞÔÍ¼##################
+##################ç›¸å…³æ€§å›¾##################
 treatData=treatData[,apply(treatData,2,sd)>0]
 pdf(file="corHeatmap.pdf", width=12, height=12)
 corrplot(corr=cor(treatData, method="spearman"),
-         method = "color",        #Í¼ĞÎµÄÕ¹Ê¾ĞÎÊ½
-         order = "hclust",        #ÃâÒßÏ¸°ûµÄÅÅĞò·½Ê½
-         tl.col="black",          #×ÖÌåÑÕÉ«
-         number.cex = 0.8,        #Ïà¹ØÏµÊı×ÖÌå´óĞ¡
-         addCoef.col = "black",   #Ïà¹ØÏµÊı×ÖÌåÑÕÉ«
-         col=colorRampPalette(c("blue", "white", "red"))(50),    #ÑÕÉ«µÄÉèÖÃ
+         method = "color",        #å›¾å½¢çš„å±•ç¤ºå½¢å¼
+         order = "hclust",        #å…ç–«ç»†èƒçš„æ’åºæ–¹å¼
+         tl.col="black",          #å­—ä½“é¢œè‰²
+         number.cex = 0.8,        #ç›¸å…³ç³»æ•°å­—ä½“å¤§å°
+         addCoef.col = "black",   #ç›¸å…³ç³»æ•°å­—ä½“é¢œè‰²
+         col=colorRampPalette(c("blue", "white", "red"))(50),    #é¢œè‰²çš„è®¾ç½®
          )
 dev.off()
-
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
-
 

@@ -7,18 +7,18 @@
 #BiocManager::install("enrichplot")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(org.Hs.eg.db)
 library(clusterProfiler)
 library(enrichplot)
 
-gene="FIBP"      #»ùÒòµÄÃû³Æ(¸ù¾İÑĞ¾¿µÄÄ¿±ê»ùÒò½øĞĞĞŞ¸Ä)
-expFile="merge.normalize.txt"          #±í´ïÊı¾İÎÄ¼ş
-gmtFile="c2.cp.kegg.Hs.symbols.gmt"    #»ùÒò¼¯ÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\22.GSEA")      #ÉèÖÃ¹¤×÷Ä¿Â¼
+gene="FIBP"      #åŸºå› çš„åç§°(æ ¹æ®ç ”ç©¶çš„ç›®æ ‡åŸºå› è¿›è¡Œä¿®æ”¹)
+expFile="merge.normalize.txt"          #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+gmtFile="c2.cp.kegg.Hs.symbols.gmt"    #åŸºå› é›†æ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\22.GSEA")      #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡ÎÄ¼ş,²¢¶ÔÊäÈëÎÄ¼ş½øĞĞÕûÀí
+#è¯»å–æ–‡ä»¶,å¹¶å¯¹è¾“å…¥æ–‡ä»¶è¿›è¡Œæ•´ç†
 rt=read.table(expFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -28,35 +28,35 @@ data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 data=avereps(data)
 data=data[rowMeans(data)>0,]
 
-#È¥³ı¶ÔÕÕ×éµÄÑùÆ·
+#å»é™¤å¯¹ç…§ç»„çš„æ ·å“
 Type=gsub("(.*)\\_(.*)\\_(.*)", "\\3", colnames(data))
 data=data[,Type=="Treat",drop=F]
 
-#¸ù¾İÄ¿±ê»ùÒò±í´ïÁ¿¶ÔÑùÆ·½øĞĞ·Ö×é£¬µÃµ½¸ßµÍ±í´ï×éµÄlogFC
-dataL=data[,data[gene,]<median(data[gene,]),drop=F]     #µÍ±í´ï×éµÄÊı¾İ
-dataH=data[,data[gene,]>=median(data[gene,]),drop=F]    #¸ß±í´ï×éµÄÊı¾İ
+#æ ¹æ®ç›®æ ‡åŸºå› è¡¨è¾¾é‡å¯¹æ ·å“è¿›è¡Œåˆ†ç»„ï¼Œå¾—åˆ°é«˜ä½è¡¨è¾¾ç»„çš„logFC
+dataL=data[,data[gene,]<median(data[gene,]),drop=F]     #ä½è¡¨è¾¾ç»„çš„æ•°æ®
+dataH=data[,data[gene,]>=median(data[gene,]),drop=F]    #é«˜è¡¨è¾¾ç»„çš„æ•°æ®
 meanL=rowMeans(dataL)
 meanH=rowMeans(dataH)
 meanL[meanL<0.00001]=0.00001
 meanH[meanH<0.00001]=0.00001
 logFC=meanH-meanL
-#¸ù¾İlogFC¶Ô»ùÒò½øĞĞÅÅĞò
+#æ ¹æ®logFCå¯¹åŸºå› è¿›è¡Œæ’åº
 logFC=sort(logFC, decreasing=T)
 genes=names(logFC)
 
-#¶ÁÈ¡»ùÒò¼¯ÎÄ¼ş
+#è¯»å–åŸºå› é›†æ–‡ä»¶
 gmt=read.gmt(gmtFile)
 
-#GSEA¸»¼¯·ÖÎö
+#GSEAå¯Œé›†åˆ†æ
 kk=GSEA(logFC, TERM2GENE=gmt, pvalueCutoff = 1)
 kkTab=as.data.frame(kk)
-#¸ù¾İpvalue<0.05¶ÔÊı¾İ½øĞĞ¹ıÂË,µÃµ½ÏÔÖø¸»¼¯µÄ½á¹û
+#æ ¹æ®pvalue<0.05å¯¹æ•°æ®è¿›è¡Œè¿‡æ»¤,å¾—åˆ°æ˜¾è‘—å¯Œé›†çš„ç»“æœ
 kkTab=kkTab[kkTab$pvalue<0.05,]
 #kkTab=kkTab[kkTab$p.adjust<0.05,]
 write.table(kkTab,file="GSEA.result.txt",sep="\t",quote=F,row.names = F)
 
-#»æÖÆ¸ß±í´ï×é¸»¼¯µÄÍ¼ĞÎ
-termNum=5     #ÉèÖÃÕ¹Ê¾Í¨Â·µÄÊıÄ¿
+#ç»˜åˆ¶é«˜è¡¨è¾¾ç»„å¯Œé›†çš„å›¾å½¢
+termNum=5     #è®¾ç½®å±•ç¤ºé€šè·¯çš„æ•°ç›®
 kkUp=kkTab[kkTab$NES>0,]
 if(nrow(kkUp)>=termNum){
 	showTerm=row.names(kkUp)[1:termNum]
@@ -66,8 +66,8 @@ if(nrow(kkUp)>=termNum){
 	dev.off()
 }
 
-#»æÖÆµÍ±í´ï×é¸»¼¯µÄÍ¼ĞÎ
-termNum=5     #ÉèÖÃÕ¹Ê¾Í¨Â·µÄÊıÄ¿
+#ç»˜åˆ¶ä½è¡¨è¾¾ç»„å¯Œé›†çš„å›¾å½¢
+termNum=5     #è®¾ç½®å±•ç¤ºé€šè·¯çš„æ•°ç›®
 kkDown=kkTab[kkTab$NES<0,]
 if(nrow(kkDown)>=termNum){
 	showTerm=row.names(kkDown)[1:termNum]
@@ -77,12 +77,5 @@ if(nrow(kkDown)>=termNum){
 	dev.off()
 }
 
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

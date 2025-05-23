@@ -1,13 +1,13 @@
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(WGCNA)
 
-expFile="merge.normalize.txt"      #±í´ïÊı¾İÎÄ¼ş
-setwd("C:\\Users\\19809\\Desktop\\MR\\WGCNA")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+expFile="merge.normalize.txt"      #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+setwd("C:\\Users\\19809\\Desktop\\MR\\WGCNA")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡ÊäÈëÎÄ¼ş£¬²¢¶ÔÊäÈëÎÄ¼şÕûÀí
+#è¯»å–è¾“å…¥æ–‡ä»¶ï¼Œå¹¶å¯¹è¾“å…¥æ–‡ä»¶æ•´ç†
 rt=read.table(expFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -15,15 +15,15 @@ exp=rt[,2:ncol(rt)]
 dimnames=list(rownames(exp),colnames(exp))
 data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 data=avereps(data)
-data=data[apply(data,1,sd)>0.5,]     #È¥³ı²¨¶¯Ğ¡µÄ»ùÒò
+data=data[apply(data,1,sd)>0.5,]     #å»é™¤æ³¢åŠ¨å°çš„åŸºå› 
 
-#ÌáÈ¡ÑùÆ·µÄ·Ö×éĞÅÏ¢(¶ÔÕÕ×éºÍÊµÑé×é)
+#æå–æ ·å“çš„åˆ†ç»„ä¿¡æ¯(å¯¹ç…§ç»„å’Œå®éªŒç»„)
 Type=gsub("(.*)\\_(.*)\\_(.*)", "\\3", colnames(data))
 conCount=length(Type[Type=="Control"])
 treatCount=length(Type[Type=="Treat"])
 datExpr0=t(data)
 
-###¼ì²éÈ±Ê§Öµ
+###æ£€æŸ¥ç¼ºå¤±å€¼
 gsg = goodSamplesGenes(datExpr0, verbose = 3)
 if (!gsg$allOK)
 {
@@ -36,24 +36,24 @@ if (!gsg$allOK)
   datExpr0 = datExpr0[gsg$goodSamples, gsg$goodGenes]
 }
 
-###ÑùÆ·¾ÛÀà
+###æ ·å“èšç±»
 sampleTree = hclust(dist(datExpr0), method = "average")
 pdf(file = "1_sample_cluster.pdf", width = 9, height = 6)
 par(cex = 0.6)
 par(mar = c(0,4,2,0))
 plot(sampleTree, main = "Sample clustering to detect outliers", sub="", xlab="", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
-###¼ôÇĞÏß
+###å‰ªåˆ‡çº¿
 abline(h = 20000, col = "red")
 dev.off()
 
-###É¾³ı¼ôÇĞÏßÒÔÏÂµÄÑùÆ·
+###åˆ é™¤å‰ªåˆ‡çº¿ä»¥ä¸‹çš„æ ·å“
 clust = cutreeStatic(sampleTree, cutHeight=20000, minSize=10)
 table(clust)
 keepSamples = (clust==1)
 datExpr0 = datExpr0[keepSamples, ]
 
 
-###×¼±¸ÑùÆ·µÄÁÙ´²Êı¾İ
+###å‡†å¤‡æ ·å“çš„ä¸´åºŠæ•°æ®
 traitData=data.frame(Control=c(rep(1,conCount),rep(0,treatCount)),
                      Treat=c(rep(0,conCount),rep(1,treatCount)))
 row.names(traitData)=colnames(data)
@@ -64,7 +64,7 @@ datExpr0=datExpr0[sameSample,]
 datTraits=traitData[sameSample,]
 
 
-###ÔÙ´Î¶ÔÑùÆ·½øĞĞ¾ÛÀà,µÃµ½ÑùÆ·¾ÛÀàµÄÈÈÍ¼
+###å†æ¬¡å¯¹æ ·å“è¿›è¡Œèšç±»,å¾—åˆ°æ ·å“èšç±»çš„çƒ­å›¾
 sampleTree2 = hclust(dist(datExpr0), method = "average")
 traitColors = numbers2colors(datTraits, signed = FALSE)
 pdf(file="2_sample_heatmap.pdf", width=9, height=7)
@@ -73,38 +73,38 @@ plotDendroAndColors(sampleTree2, traitColors,
                     main = "Sample dendrogram and trait heatmap")
 dev.off()
 
-###powerÖµµÄÉ¢µãÍ¼
-enableWGCNAThreads()   #¶àÏß³Ì¹¤×÷
-powers = c(1:20)       #ÃİÖ¸Êı·¶Î§1:20
+###powerå€¼çš„æ•£ç‚¹å›¾
+enableWGCNAThreads()   #å¤šçº¿ç¨‹å·¥ä½œ
+powers = c(1:20)       #å¹‚æŒ‡æ•°èŒƒå›´1:20
 sft = pickSoftThreshold(datExpr0, powerVector = powers, verbose = 5)
 pdf(file="3_scale_independence.pdf", width=9, height=5)
 par(mfrow = c(1,2))
 cex1 = 0.9
-###ÄâºÏÖ¸ÊıÓëpowerÖµÉ¢µãÍ¼
+###æ‹ŸåˆæŒ‡æ•°ä¸powerå€¼æ•£ç‚¹å›¾
 plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
      xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
      main = paste("Scale independence"));
 text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
      labels=powers,cex=cex1,col="red");
-abline(h=0.8, col="red") #¿ÉÒÔĞŞ¸Ä
-###Æ½¾ùÁ¬Í¨ĞÔÓëpowerÖµÉ¢µãÍ¼
+abline(h=0.8, col="red") #å¯ä»¥ä¿®æ”¹
+###å¹³å‡è¿é€šæ€§ä¸powerå€¼æ•£ç‚¹å›¾
 plot(sft$fitIndices[,1], sft$fitIndices[,5],
      xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
      main = paste("Mean connectivity"))
 text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 dev.off()
 
-###ÁÚ½Ó¾ØÕó×ª»»
-sft      #²é¿´×î¼ÑpowerÖµ
-softPower =sft$powerEstimate      #×î¼ÑpowerÖµ
+###é‚»æ¥çŸ©é˜µè½¬æ¢
+sft      #æŸ¥çœ‹æœ€ä½³powerå€¼
+softPower =sft$powerEstimate      #æœ€ä½³powerå€¼
 adjacency = adjacency(datExpr0, power = softPower)
 softPower
 
-###TOM¾àÀë¾ØÕó
+###TOMè·ç¦»çŸ©é˜µ
 TOM = TOMsimilarity(adjacency)
 dissTOM = 1-TOM
 
-###»ùÒò¾ÛÀà
+###åŸºå› èšç±»
 geneTree = hclust(as.dist(dissTOM), method = "average");
 pdf(file="4_gene_clustering.pdf", width=8, height=6)
 plot(geneTree, xlab="", sub="", main = "Gene clustering on TOM-based dissimilarity",
@@ -112,8 +112,8 @@ plot(geneTree, xlab="", sub="", main = "Gene clustering on TOM-based dissimilari
 dev.off()
 
 
-###¶¯Ì¬µÄÄ£¿éÊ¶±ğ(µÃµ½Ã¿¸ö»ùÒòÊôÓÚÄÄ¸öÄ£¿é)
-minModuleSize = 60      #Ä£¿é»ùÒòÊıÄ¿(Ã¿¸öÄ£¿éÖÁÉÙ°üº¬60¸ö»ùÒò)
+###åŠ¨æ€çš„æ¨¡å—è¯†åˆ«(å¾—åˆ°æ¯ä¸ªåŸºå› å±äºå“ªä¸ªæ¨¡å—)
+minModuleSize = 60      #æ¨¡å—åŸºå› æ•°ç›®(æ¯ä¸ªæ¨¡å—è‡³å°‘åŒ…å«60ä¸ªåŸºå› )
 dynamicMods = cutreeDynamic(dendro = geneTree, distM = dissTOM,
                             deepSplit = 2, pamRespectsDendro = FALSE,
                             minClusterSize = minModuleSize);
@@ -128,7 +128,7 @@ plotDendroAndColors(geneTree, dynamicColors, "Dynamic Tree Cut",
 dev.off()
 
 
-###¶ÔÄ£¿é½øĞĞ¾ÛÀà,ÕÒ³öÏàËÆÄ£¿é¾ÛÀà
+###å¯¹æ¨¡å—è¿›è¡Œèšç±»,æ‰¾å‡ºç›¸ä¼¼æ¨¡å—èšç±»
 MEList = moduleEigengenes(datExpr0, colors = dynamicColors)
 MEs = MEList$eigengenes
 MEDiss = 1-cor(MEs);
@@ -136,12 +136,12 @@ METree = hclust(as.dist(MEDiss), method = "average")
 pdf(file="6_Clustering_module.pdf", width=7, height=6)
 plot(METree, main = "Clustering of module eigengenes",
      xlab = "", sub = "")
-MEDissThres = 0.40     #¼ôÇĞ¸ß¶È¿ÉĞŞ¸Ä
+MEDissThres = 0.40     #å‰ªåˆ‡é«˜åº¦å¯ä¿®æ”¹
 abline(h=MEDissThres, col = "red")
 dev.off()
 
 
-###ÏàËÆÄ£¿éºÏ²¢(µÃµ½×îÖÕµÄÃ¿¸ö»ùÒòËùÊôµÄÄ£¿é)
+###ç›¸ä¼¼æ¨¡å—åˆå¹¶(å¾—åˆ°æœ€ç»ˆçš„æ¯ä¸ªåŸºå› æ‰€å±çš„æ¨¡å—)
 merge = mergeCloseModules(datExpr0, dynamicColors, cutHeight = MEDissThres, verbose = 3)
 mergedColors = merge$colors
 mergedMEs = merge$newMEs
@@ -158,7 +158,7 @@ moduleLabels = match(moduleColors, colorOrder)-1
 MEs = mergedMEs
 
 
-###»æÖÆÄ£¿éÓëÁÙ´²ĞÔ×´Ïà¹ØĞÔµÄÈÈÍ¼
+###ç»˜åˆ¶æ¨¡å—ä¸ä¸´åºŠæ€§çŠ¶ç›¸å…³æ€§çš„çƒ­å›¾
 nGenes = ncol(datExpr0)
 nSamples = nrow(datExpr0)
 moduleTraitCor = cor(MEs, datTraits, use = "p")
@@ -169,20 +169,20 @@ textMatrix = paste(signif(moduleTraitCor, 2), "\n(",
 dim(textMatrix) = dim(moduleTraitCor)
 par(mar = c(5, 10, 3, 3))
 labeledHeatmap(Matrix = moduleTraitCor,
-               xLabels = names(datTraits),    #XÖáµÄ±êÇ©
-               yLabels = names(MEs),          #YÖáµÄ±êÇ©
+               xLabels = names(datTraits),    #Xè½´çš„æ ‡ç­¾
+               yLabels = names(MEs),          #Yè½´çš„æ ‡ç­¾
                ySymbols = names(MEs),
                colorLabels = FALSE,
-               colors = blueWhiteRed(50),    #Í¼ĞÎµÄÑÕÉ«
-               textMatrix = textMatrix,      #Í¼ĞÎÕ¹Ê¾µÄÎÄ±¾ĞÅÏ¢
+               colors = blueWhiteRed(50),    #å›¾å½¢çš„é¢œè‰²
+               textMatrix = textMatrix,      #å›¾å½¢å±•ç¤ºçš„æ–‡æœ¬ä¿¡æ¯
                setStdMargins = FALSE,
-               cex.text = 0.75,          #×ÖÌåµÄ´óĞ¡
-               zlim = c(-1,1),           #Ïà¹ØÏµÊıµÄ·¶Î§
-               main = paste("Module-trait relationships"))     #Í¼ĞÎµÄ±êÌâ
+               cex.text = 0.75,          #å­—ä½“çš„å¤§å°
+               zlim = c(-1,1),           #ç›¸å…³ç³»æ•°çš„èŒƒå›´
+               main = paste("Module-trait relationships"))     #å›¾å½¢çš„æ ‡é¢˜
 dev.off()
 
 
-###¼ÆËãMMºÍGSÖµ
+###è®¡ç®—MMå’ŒGSå€¼
 modNames = substring(names(MEs), 3)
 geneModuleMembership = as.data.frame(cor(datExpr0, MEs, use = "p"))
 MMPvalue = as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership), nSamples))
@@ -194,7 +194,7 @@ GSPvalue = as.data.frame(corPvalueStudent(as.matrix(geneTraitSignificance), nSam
 names(geneTraitSignificance) = paste("GS.", traitNames, sep="")
 names(GSPvalue) = paste("p.GS.", traitNames, sep="")
 
-###Êä³öÄ£¿éÖØÒªĞÔµÄÍ¼ĞÎ
+###è¾“å‡ºæ¨¡å—é‡è¦æ€§çš„å›¾å½¢
 y=datTraits[,1]
 GS1=as.numeric(cor(y, datExpr0, use="p"))
 GeneSignificance=abs(GS1)
@@ -203,7 +203,7 @@ pdf(file="9_GeneSignificance.pdf", width=12.5, height=10.5)
 plotModuleSignificance(GeneSignificance, mergedColors)
 dev.off()
 
-###¶ÔÄ£¿é½øĞĞÑ­»·£¬µÃµ½Ã¿¸öÄ£¿éµÄÉ¢µãÍ¼
+###å¯¹æ¨¡å—è¿›è¡Œå¾ªç¯ï¼Œå¾—åˆ°æ¯ä¸ªæ¨¡å—çš„æ•£ç‚¹å›¾
 trait="Treat"
 traitColumn=match(trait,traitNames)  
 for (module in modNames){
@@ -225,7 +225,7 @@ for (module in modNames){
 }
 
 
-###Êä³öGS_MMÊı¾İ
+###è¾“å‡ºGS_MMæ•°æ®
 probes = colnames(datExpr0)
 geneInfo0 = data.frame(probes= probes,
                        moduleColor = moduleColors)
@@ -249,7 +249,7 @@ geneInfo = geneInfo0[geneOrder, ]
 write.table(geneInfo, file = "GS_MM.xls",sep="\t",row.names=F)
 
 
-###Êä³öÃ¿¸öÄ£¿éµÄ»ùÒò
+###è¾“å‡ºæ¯ä¸ªæ¨¡å—çš„åŸºå› 
 for (mod in 1:nrow(table(moduleColors))){  
 	modules = names(table(moduleColors))[mod]
 	probes = colnames(datExpr0)
@@ -259,11 +259,6 @@ for (mod in 1:nrow(table(moduleColors))){
 }
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 
 

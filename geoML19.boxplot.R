@@ -7,17 +7,17 @@
 #install.packages("PerformanceAnalytics")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(reshape2)
 library(ggpubr)
 library(PerformanceAnalytics)
 
-expFile="merge.normalize.txt"      #±í´ïÊı¾İÎÄ¼ş
-geneFile="modelGene.list.txt"      #»ùÒòÁĞ±íÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\19.boxplot")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+expFile="merge.normalize.txt"      #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+geneFile="modelGene.list.txt"      #åŸºå› åˆ—è¡¨æ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\19.boxplot")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡±í´ïÊı¾İÎÄ¼ş
+#è¯»å–è¡¨è¾¾æ•°æ®æ–‡ä»¶
 rt=read.table(expFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -26,21 +26,21 @@ dimnames=list(rownames(exp), colnames(exp))
 data=matrix(as.numeric(as.matrix(exp)), nrow=nrow(exp), dimnames=dimnames)
 data=avereps(data)
 
-#¶ÁÈ¡»ùÒòÁĞ±íÎÄ¼ş, ÌáÈ¡Ä£ĞÍ»ùÒòµÄ±í´ïÁ¿
+#è¯»å–åŸºå› åˆ—è¡¨æ–‡ä»¶, æå–æ¨¡å‹åŸºå› çš„è¡¨è¾¾é‡
 geneRT=read.table(geneFile, header=F, sep="\t", check.names=F)
 sameGene=intersect(as.vector(geneRT[,1]), row.names(data))
 data=t(data[sameGene,])
 
-#»ñÈ¡ÑùÆ·µÄ·Ö×éĞÅÏ¢(¶ÔÕÕ×éºÍÊµÑé×é)
+#è·å–æ ·å“çš„åˆ†ç»„ä¿¡æ¯(å¯¹ç…§ç»„å’Œå®éªŒç»„)
 Type=gsub("(.*)\\_(.*?)", "\\2", row.names(data))
 treatData=data[Type=="Treat",]
 rt=cbind(as.data.frame(data), Type)
 
-#½«Êı¾İ×ª»»ÎªÏäÏßÍ¼µÄÊäÈëÎÄ¼ş
+#å°†æ•°æ®è½¬æ¢ä¸ºç®±çº¿å›¾çš„è¾“å…¥æ–‡ä»¶
 data=melt(rt, id.vars=c("Type"))
 colnames(data)=c("Type", "Gene", "Expression")
 
-#»æÖÆÏäÏßÍ¼
+#ç»˜åˆ¶ç®±çº¿å›¾
 p=ggboxplot(data, x="Gene", y="Expression", fill = "Type",
 	     xlab="",
 	     ylab="Gene expression",
@@ -52,22 +52,16 @@ p1=p+stat_compare_means(aes(group=Type),
 	      symnum.args=list(cutpoints = c(0, 0.001, 0.01, 0.05, 1), symbols = c("***", "**", "*", " ")),
 	      label = "p.signif")
 
-#Êä³öÍ¼ĞÎ
+#è¾“å‡ºå›¾å½¢
 pdf(file="boxplot.pdf", width=6, height=4.5)
 print(p1)
 dev.off()
 
-#»æÖÆÏà¹ØĞÔÍ¼ĞÎ(PerformanceAnalytics°ü)
+#ç»˜åˆ¶ç›¸å…³æ€§å›¾å½¢(PerformanceAnalyticsåŒ…)
 pdf(file="cor.pdf", width=7, height=6.5)
 chart.Correlation(treatData, histogram=TRUE, pch=19, method="pearson")
 dev.off()
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

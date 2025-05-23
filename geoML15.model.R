@@ -9,7 +9,7 @@
 #BiocManager::install("ComplexHeatmap")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(openxlsx)
 library(seqinr)
 library(plyr)
@@ -29,23 +29,23 @@ library(RColorBrewer)
 library(pROC)
 
 
-#ÉèÖÃ¹¤×÷Ä¿Â¼
+#è®¾ç½®å·¥ä½œç›®å½•
 setwd("C:\\Users\\lexb\\Desktop\\geoML\\15.ML")
 source("refer.ML.R")
 
-#¶ÁÈ¡ÑµÁ·×éµÄÊı¾İÎÄ¼ş
+#è¯»å–è®­ç»ƒç»„çš„æ•°æ®æ–‡ä»¶
 Train_data <- read.table("data.train.txt", header = T, sep = "\t", check.names=F, row.names=1, stringsAsFactors=F)
 Train_expr=Train_data[,1:(ncol(Train_data)-1),drop=F]
 Train_class=Train_data[,ncol(Train_data),drop=F]
 
-#¶ÁÈ¡ÑéÖ¤×éµÄÊı¾İÎÄ¼ş
+#è¯»å–éªŒè¯ç»„çš„æ•°æ®æ–‡ä»¶
 Test_data <- read.table("data.test.txt", header=T, sep="\t", check.names=F, row.names=1, stringsAsFactors = F)
 Test_expr=Test_data[,1:(ncol(Test_data)-1),drop=F]
 Test_class=Test_data[,ncol(Test_data),drop=F]
 Test_class$Cohort=gsub("(.*)\\_(.*)\\_(.*)", "\\1", row.names(Test_class))
 Test_class=Test_class[,c("Cohort", "Type")]
 
-#»ñÈ¡ÑµÁ·×éºÍÑéÖ¤×éµÄ½»¼¯»ùÒò
+#è·å–è®­ç»ƒç»„å’ŒéªŒè¯ç»„çš„äº¤é›†åŸºå› 
 comgene <- intersect(colnames(Train_expr), colnames(Test_expr))
 Train_expr <- as.matrix(Train_expr[,comgene])
 Test_expr <- as.matrix(Test_expr[,comgene])
@@ -53,37 +53,37 @@ Train_set = scaleData(data=Train_expr, centerFlags=T, scaleFlags=T)
 names(x = split(as.data.frame(Test_expr), f = Test_class$Cohort))
 Test_set = scaleData(data = Test_expr, cohort = Test_class$Cohort, centerFlags = T, scaleFlags = T)
 
-#¶ÁÈ¡»úÆ÷Ñ§Ï°·½·¨µÄÎÄ¼ş
+#è¯»å–æœºå™¨å­¦ä¹ æ–¹æ³•çš„æ–‡ä»¶
 methodRT <- read.table("refer.methodLists.txt", header=T, sep="\t", check.names=F)
 methods=methodRT$Model
 methods <- gsub("-| ", "", methods)
 
 
-#×¼±¸»úÆ÷Ñ§Ï°Ä£ĞÍµÄ²ÎÊı
-classVar = "Type"         #ÉèÖÃ·ÖÀàµÄ±äÁ¿Ãû
-min.selected.var = 5      #»ùÒòÊıÄ¿µÄãĞÖµ
+#å‡†å¤‡æœºå™¨å­¦ä¹ æ¨¡å‹çš„å‚æ•°
+classVar = "Type"         #è®¾ç½®åˆ†ç±»çš„å˜é‡å
+min.selected.var = 5      #åŸºå› æ•°ç›®çš„é˜ˆå€¼
 Variable = colnames(Train_set)
 preTrain.method =  strsplit(methods, "\\+")
 preTrain.method = lapply(preTrain.method, function(x) rev(x)[-1])
 preTrain.method = unique(unlist(preTrain.method))
 
 
-######################¸ù¾İÑµÁ·×éÊı¾İ¹¹½¨»úÆ÷Ñ§Ï°Ä£ĞÍ######################
-#¸ù¾İÄ£ĞÍ×éºÏµÚÒ»ÖÖ»úÆ÷Ñ§Ï°·½·¨É¸Ñ¡±äÁ¿
-preTrain.var <- list()       #ÓÃÓÚ±£´æ¸÷Ëã·¨É¸Ñ¡µÄ±äÁ¿
-set.seed(seed = 123)         #ÉèÖÃÖÖ×Ó
+######################æ ¹æ®è®­ç»ƒç»„æ•°æ®æ„å»ºæœºå™¨å­¦ä¹ æ¨¡å‹######################
+#æ ¹æ®æ¨¡å‹ç»„åˆç¬¬ä¸€ç§æœºå™¨å­¦ä¹ æ–¹æ³•ç­›é€‰å˜é‡
+preTrain.var <- list()       #ç”¨äºä¿å­˜å„ç®—æ³•ç­›é€‰çš„å˜é‡
+set.seed(seed = 123)         #è®¾ç½®ç§å­
 for (method in preTrain.method){
-  preTrain.var[[method]] = RunML(method = method,              #»úÆ÷Ñ§Ï°·½·¨
-                                 Train_set = Train_set,        #ÑµÁ·×éµÄ»ùÒò±í´ïÊı¾İ
-                                 Train_label = Train_class,    #ÑµÁ·×éµÄ·ÖÀàÊı¾İ
-                                 mode = "Variable",            #Ñ¡ÔñÔËĞĞÄ£Ê½(É¸Ñ¡±äÁ¿)
+  preTrain.var[[method]] = RunML(method = method,              #æœºå™¨å­¦ä¹ æ–¹æ³•
+                                 Train_set = Train_set,        #è®­ç»ƒç»„çš„åŸºå› è¡¨è¾¾æ•°æ®
+                                 Train_label = Train_class,    #è®­ç»ƒç»„çš„åˆ†ç±»æ•°æ®
+                                 mode = "Variable",            #é€‰æ‹©è¿è¡Œæ¨¡å¼(ç­›é€‰å˜é‡)
                                  classVar = classVar)
 }
 preTrain.var[["simple"]] <- colnames(Train_set)
 
-#¸ù¾İÄ£ĞÍ×éºÏµÚ¶şÖÖ»úÆ÷Ñ§Ï°·½·¨¹¹½¨Ä£ĞÍ
-model <- list()            #³õÊ¼»¯Ä£ĞÍ½á¹ûÁĞ±í
-set.seed(seed = 123)       #ÉèÖÃÖÖ×Ó
+#æ ¹æ®æ¨¡å‹ç»„åˆç¬¬äºŒç§æœºå™¨å­¦ä¹ æ–¹æ³•æ„å»ºæ¨¡å‹
+model <- list()            #åˆå§‹åŒ–æ¨¡å‹ç»“æœåˆ—è¡¨
+set.seed(seed = 123)       #è®¾ç½®ç§å­
 Train_set_bk = Train_set
 for (method in methods){
   cat(match(method, methods), ":", method, "\n")
@@ -93,25 +93,25 @@ for (method in methods){
   Variable = preTrain.var[[method[1]]]
   Train_set = Train_set_bk[, Variable]
   Train_label = Train_class
-  model[[method_name]] <- RunML(method = method[2],           #»úÆ÷Ñ§Ï°·½·¨
-                                Train_set = Train_set,        #ÑµÁ·×éµÄ»ùÒò±í´ïÊı¾İ
-                                Train_label = Train_label,    #ÑµÁ·×éµÄ·ÖÀàÊı¾İ
-                                mode = "Model",               #Ñ¡ÔñÔËĞĞÄ£Ê½(¹¹½¨Ä£ĞÍ)
+  model[[method_name]] <- RunML(method = method[2],           #æœºå™¨å­¦ä¹ æ–¹æ³•
+                                Train_set = Train_set,        #è®­ç»ƒç»„çš„åŸºå› è¡¨è¾¾æ•°æ®
+                                Train_label = Train_label,    #è®­ç»ƒç»„çš„åˆ†ç±»æ•°æ®
+                                mode = "Model",               #é€‰æ‹©è¿è¡Œæ¨¡å¼(æ„å»ºæ¨¡å‹)
                                 classVar = classVar)
   
-  #Èç¹ûÄ³ÖÖ»úÆ÷Ñ§Ï°·½·¨É¸Ñ¡³öµÄ±äÁ¿Ğ¡ÓÚãĞÖµ£¬Ôò¸Ã·½·¨½á¹ûÎª¿Õ
+  #å¦‚æœæŸç§æœºå™¨å­¦ä¹ æ–¹æ³•ç­›é€‰å‡ºçš„å˜é‡å°äºé˜ˆå€¼ï¼Œåˆ™è¯¥æ–¹æ³•ç»“æœä¸ºç©º
   if(length(ExtractVar(model[[method_name]])) <= min.selected.var) {
     model[[method_name]] <- NULL
   }
 }
 Train_set = Train_set_bk; rm(Train_set_bk)
-#±£´æËùÓĞ»úÆ÷Ñ§Ï°Ä£ĞÍµÄ½á¹û
+#ä¿å­˜æ‰€æœ‰æœºå™¨å­¦ä¹ æ¨¡å‹çš„ç»“æœ
 saveRDS(model, "model.MLmodel.rds")
 
-#¹¹½¨¶à±äÁ¿Âß¼­»Ø¹éÄ£ĞÍ
+#æ„å»ºå¤šå˜é‡é€»è¾‘å›å½’æ¨¡å‹
 FinalModel <- c("panML", "multiLogistic")[2]
 if (FinalModel == "multiLogistic"){
-  logisticmodel <- lapply(model, function(fit){    #¸ù¾İÂß¼­»Ø¹éÄ£ĞÍ¼ÆËãÃ¿¸öÑù±¾µÄ·ÖÀà¸ÅÂÊ
+  logisticmodel <- lapply(model, function(fit){    #æ ¹æ®é€»è¾‘å›å½’æ¨¡å‹è®¡ç®—æ¯ä¸ªæ ·æœ¬çš„åˆ†ç±»æ¦‚ç‡
     tmp <- glm(formula = Train_class[[classVar]] ~ .,
                family = "binomial", 
                data = as.data.frame(Train_set[, ExtractVar(fit)]))
@@ -119,15 +119,15 @@ if (FinalModel == "multiLogistic"){
     return(tmp)
   })
 }
-#±£´æ×îÖÕÒÔ¶à±äÁ¿Âß¼­»Ø¹éÄ£ĞÍ
+#ä¿å­˜æœ€ç»ˆä»¥å¤šå˜é‡é€»è¾‘å›å½’æ¨¡å‹
 saveRDS(logisticmodel, "model.logisticmodel.rds")
 
 
-#¸ù¾İ»ùÒò±í´ïÁ¿¼ÆËãÃ¿¸öÑù±¾µÄ·ÖÀàµÃ·Ö
-model <- readRDS("model.MLmodel.rds")            #Ê¹ÓÃ¸÷¸ö»úÆ÷Ñ§Ï°Ä£ĞÍµÄÏßĞÔ×éºÏº¯Êı¼ÆËãµÃ·Ö
-#model <- readRDS("model.logisticmodel.rds")     #Ê¹ÓÃ¶à±äÁ¿Âß¼­»Ø¹éÄ£ĞÍ¼ÆËãµÃ·Ö
-methodsValid <- names(model)                     #¸ù¾İÌØÕ÷»ùÒòÊıÄ¿ÌáÈ¡ÓĞĞ§µÄÄ£ĞÍ
-#¸ù¾İ»ùÒò±í´ïÁ¿Ô¤²âÑù±¾µÄ·çÏÕµÃ·Ö
+#æ ¹æ®åŸºå› è¡¨è¾¾é‡è®¡ç®—æ¯ä¸ªæ ·æœ¬çš„åˆ†ç±»å¾—åˆ†
+model <- readRDS("model.MLmodel.rds")            #ä½¿ç”¨å„ä¸ªæœºå™¨å­¦ä¹ æ¨¡å‹çš„çº¿æ€§ç»„åˆå‡½æ•°è®¡ç®—å¾—åˆ†
+#model <- readRDS("model.logisticmodel.rds")     #ä½¿ç”¨å¤šå˜é‡é€»è¾‘å›å½’æ¨¡å‹è®¡ç®—å¾—åˆ†
+methodsValid <- names(model)                     #æ ¹æ®ç‰¹å¾åŸºå› æ•°ç›®æå–æœ‰æ•ˆçš„æ¨¡å‹
+#æ ¹æ®åŸºå› è¡¨è¾¾é‡é¢„æµ‹æ ·æœ¬çš„é£é™©å¾—åˆ†
 RS_list <- list()
 for (method in methodsValid){
   RS_list[[method]] <- CalPredictScore(fit = model[[method]], new_data = rbind.data.frame(Train_set,Test_set))
@@ -136,17 +136,17 @@ riskTab=as.data.frame(t(do.call(rbind, RS_list)))
 riskTab=cbind(id=row.names(riskTab), riskTab)
 write.table(riskTab, "model.riskMatrix.txt", sep="\t", row.names=F, quote=F)
 
-#¸ù¾İ»ùÒò±í´ïÁ¿Ô¤²âÑùÆ·µÄ·ÖÀà
+#æ ¹æ®åŸºå› è¡¨è¾¾é‡é¢„æµ‹æ ·å“çš„åˆ†ç±»
 Class_list <- list()
 for (method in methodsValid){
   Class_list[[method]] <- PredictClass(fit = model[[method]], new_data = rbind.data.frame(Train_set,Test_set))
 }
 Class_mat <- as.data.frame(t(do.call(rbind, Class_list)))
-#Class_mat <- cbind.data.frame(Test_class, Class_mat[rownames(Class_mat),]) # ÈôÒªºÏ²¢²âÊÔ¼¯±¾ÉíµÄÑù±¾ĞÅÏ¢ÎÄ¼ş¿ÉÔËĞĞ´ËĞĞ
+#Class_mat <- cbind.data.frame(Test_class, Class_mat[rownames(Class_mat),]) # è‹¥è¦åˆå¹¶æµ‹è¯•é›†æœ¬èº«çš„æ ·æœ¬ä¿¡æ¯æ–‡ä»¶å¯è¿è¡Œæ­¤è¡Œ
 classTab=cbind(id=row.names(Class_mat), Class_mat)
 write.table(classTab, "model.classMatrix.txt", sep="\t", row.names=F, quote=F)
 
-#ÌáÈ¡Ã¿ÖÖ»úÆ÷Ñ§Ï°·½·¨É¸Ñ¡µ½µÄ±äÁ¿
+#æå–æ¯ç§æœºå™¨å­¦ä¹ æ–¹æ³•ç­›é€‰åˆ°çš„å˜é‡
 fea_list <- list()
 for (method in methodsValid) {
   fea_list[[method]] <- ExtractVar(model[[method]])
@@ -159,59 +159,53 @@ fea_df$algorithm <- gsub("(.+)\\.(.+$)", "\\1", rownames(fea_df))
 colnames(fea_df)[1] <- "features"
 write.table(fea_df, file="model.genes.txt", sep = "\t", row.names = F, col.names = T, quote = F)
 
-#¼ÆËãÃ¿¸öÄ£ĞÍµÄAUCÖµ
+#è®¡ç®—æ¯ä¸ªæ¨¡å‹çš„AUCå€¼
 AUC_list <- list()
 for (method in methodsValid){
-  AUC_list[[method]] <- RunEval(fit = model[[method]],      #»úÆ÷Ñ§Ï°Ä£ĞÍ
-                                Test_set = Test_set,        #ÑéÖ¤×éµÄ±í´ïÊı¾İ
-                                Test_label = Test_class,    #ÑéÖ¤×éµÄ·ÖÀàÊı¾İ
-                                Train_set = Train_set,      #ÑµÁ·×éµÄ±í´ïÊı¾İ
-                                Train_label = Train_class,  #ÑµÁ·×éµÄ·ÖÀàÊı¾İ
-                                Train_name = "Train",       #ÑµÁ·×éµÄ±êÇ©
-                                cohortVar = "Cohort",       #GEOµÄid
-                                classVar = classVar)        #·ÖÀà±äÁ¿
+  AUC_list[[method]] <- RunEval(fit = model[[method]],      #æœºå™¨å­¦ä¹ æ¨¡å‹
+                                Test_set = Test_set,        #éªŒè¯ç»„çš„è¡¨è¾¾æ•°æ®
+                                Test_label = Test_class,    #éªŒè¯ç»„çš„åˆ†ç±»æ•°æ®
+                                Train_set = Train_set,      #è®­ç»ƒç»„çš„è¡¨è¾¾æ•°æ®
+                                Train_label = Train_class,  #è®­ç»ƒç»„çš„åˆ†ç±»æ•°æ®
+                                Train_name = "Train",       #è®­ç»ƒç»„çš„æ ‡ç­¾
+                                cohortVar = "Cohort",       #GEOçš„id
+                                classVar = classVar)        #åˆ†ç±»å˜é‡
 }
 AUC_mat <- do.call(rbind, AUC_list)
 aucTab=cbind(Method=row.names(AUC_mat), AUC_mat)
 write.table(aucTab, "model.AUCmatrix.txt", sep="\t", row.names=F, quote=F)
 
 
-##############################»æÖÆAUCÈÈÍ¼##############################
-#×¼±¸Í¼ĞÎµÄÊı¾İ
+##############################ç»˜åˆ¶AUCçƒ­å›¾##############################
+#å‡†å¤‡å›¾å½¢çš„æ•°æ®
 AUC_mat <- read.table("model.AUCmatrix.txt", header=T, sep="\t", check.names=F, row.names=1, stringsAsFactors=F)
 
-#¸ù¾İAUCµÄ¾ùÖµ¶Ô»úÆ÷Ñ§Ï°Ä£ĞÍ½øĞĞÅÅĞò
+#æ ¹æ®AUCçš„å‡å€¼å¯¹æœºå™¨å­¦ä¹ æ¨¡å‹è¿›è¡Œæ’åº
 avg_AUC <- apply(AUC_mat, 1, mean)
 avg_AUC <- sort(avg_AUC, decreasing = T)
 AUC_mat <- AUC_mat[names(avg_AUC),]
-#»ñÈ¡×îÓÅÄ£ĞÍ(ÑµÁ·×é+²âÊÔ×éµÄAUC¾ùÖµ×î´ó)
+#è·å–æœ€ä¼˜æ¨¡å‹(è®­ç»ƒç»„+æµ‹è¯•ç»„çš„AUCå‡å€¼æœ€å¤§)
 fea_sel <- fea_list[[rownames(AUC_mat)[1]]]
 avg_AUC <- as.numeric(format(avg_AUC, digits = 3, nsmall = 3))
 
-#ÉèÖÃÈÈÍ¼×¢ÊÍµÄÑÕÉ«
+#è®¾ç½®çƒ­å›¾æ³¨é‡Šçš„é¢œè‰²
 CohortCol <- brewer.pal(n = ncol(AUC_mat), name = "Paired")
 names(CohortCol) <- colnames(AUC_mat)
 
-#»æÖÆÍ¼ĞÎ
+#ç»˜åˆ¶å›¾å½¢
 cellwidth = 1; cellheight = 0.5
-hm <- SimpleHeatmap(Cindex_mat = AUC_mat,       #AUC¾ØÕó
-                    avg_Cindex = avg_AUC,       #AUC¾ùÖµ
-                    CohortCol = CohortCol,      #Êı¾İ¼¯µÄÑÕÉ«
-                    barCol = "steelblue",       #ÓÒ²àÖù×´Í¼µÄÑÕÉ«
-                    cellwidth = cellwidth, cellheight = cellheight,    #ÈÈÍ¼Ã¿¸ö¸ñ×ÓµÄ¿í¶ÈºÍ¸ß¶È
-                    cluster_columns = F, cluster_rows = F)      #ÊÇ·ñ¶ÔÊı¾İ½øĞĞ¾ÛÀà
+hm <- SimpleHeatmap(Cindex_mat = AUC_mat,       #AUCçŸ©é˜µ
+                    avg_Cindex = avg_AUC,       #AUCå‡å€¼
+                    CohortCol = CohortCol,      #æ•°æ®é›†çš„é¢œè‰²
+                    barCol = "steelblue",       #å³ä¾§æŸ±çŠ¶å›¾çš„é¢œè‰²
+                    cellwidth = cellwidth, cellheight = cellheight,    #çƒ­å›¾æ¯ä¸ªæ ¼å­çš„å®½åº¦å’Œé«˜åº¦
+                    cluster_columns = F, cluster_rows = F)      #æ˜¯å¦å¯¹æ•°æ®è¿›è¡Œèšç±»
 
-#Êä³öÈÈÍ¼
+#è¾“å‡ºçƒ­å›¾
 pdf(file="model.AUCheatmap.pdf", width=cellwidth * ncol(AUC_mat) + 6, height=cellheight * nrow(AUC_mat) * 0.45)
 draw(hm, heatmap_legend_side="right", annotation_legend_side="right")
 dev.off()
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

@@ -1,30 +1,30 @@
 #install.packages("pROC")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(pROC)
 
-rsFile="model.riskMatrix.txt"      #·çÏÕ¾ØÕóÎÄ¼ş
-method="glmBoost+RF"               #Ñ¡Ôñ»úÆ÷Ñ§Ï°µÄ·½·¨(ĞèÒª¸ù¾İÈÈÍ¼½øĞĞĞŞ¸Ä)
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\16.ROC")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+rsFile="model.riskMatrix.txt"      #é£é™©çŸ©é˜µæ–‡ä»¶
+method="glmBoost+RF"               #é€‰æ‹©æœºå™¨å­¦ä¹ çš„æ–¹æ³•(éœ€è¦æ ¹æ®çƒ­å›¾è¿›è¡Œä¿®æ”¹)
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\16.ROC")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡·çÏÕÎÄ¼ş
+#è¯»å–é£é™©æ–‡ä»¶
 riskRT=read.table(rsFile, header=T, sep="\t", check.names=F, row.names=1)
-#»ñÈ¡Êı¾İ¼¯µÄID
+#è·å–æ•°æ®é›†çš„ID
 CohortID=gsub("(.*)\\_(.*)\\_(.*)", "\\1", rownames(riskRT))
 CohortID=gsub("(.*)\\.(.*)", "\\1", CohortID)
 riskRT$Cohort=CohortID
 
-#¶ÔÊı¾İ¼¯½øĞĞÑ­»·
+#å¯¹æ•°æ®é›†è¿›è¡Œå¾ªç¯
 for(Cohort in unique(riskRT$Cohort)){
-	#ÌáÈ¡ÑùÆ·µÄ·Ö×éĞÅÏ¢(¶ÔÕÕ×éºÍÊµÑé×é)
+	#æå–æ ·å“çš„åˆ†ç»„ä¿¡æ¯(å¯¹ç…§ç»„å’Œå®éªŒç»„)
 	rt=riskRT[riskRT$Cohort==Cohort,]
 	y=gsub("(.*)\\_(.*)\\_(.*)", "\\3", row.names(rt))
 	y=ifelse(y=="Control", 0, 1)
 	
-	#»æÖÆROCÇúÏß
-	roc1=roc(y, as.numeric(rt[,method]))      #µÃµ½Ä£ĞÍROCÇúÏßµÄ²ÎÊı
-	ci1=ci.auc(roc1, method="bootstrap")      #µÃµ½ROCÇúÏßÏÂÃæ»ıµÄ²¨¶¯·¶Î§
+	#ç»˜åˆ¶ROCæ›²çº¿
+	roc1=roc(y, as.numeric(rt[,method]))      #å¾—åˆ°æ¨¡å‹ROCæ›²çº¿çš„å‚æ•°
+	ci1=ci.auc(roc1, method="bootstrap")      #å¾—åˆ°ROCæ›²çº¿ä¸‹é¢ç§¯çš„æ³¢åŠ¨èŒƒå›´
 	ciVec=as.numeric(ci1)
 	pdf(file=paste0("ROC.", Cohort, ".pdf"), width=5, height=4.75)
 	plot(roc1, print.auc=TRUE, col="red", legacy.axes=T, main=Cohort)
@@ -33,11 +33,6 @@ for(Cohort in unique(riskRT$Cohort)){
 }
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 
 

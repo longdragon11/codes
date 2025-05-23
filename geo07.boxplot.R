@@ -2,26 +2,26 @@
 #install.packages("ggplot2")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(reshape2)
 library(ggplot2)
 
-setwd("C:\\Users\\19809\\Desktop\\MR\\boxplot")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+setwd("C:\\Users\\19809\\Desktop\\MR\\boxplot")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶¨ÒåÏäÏßÍ¼µÄº¯Êı
+#å®šä¹‰ç®±çº¿å›¾çš„å‡½æ•°
 bioBoxplot=function(inputFile=null, outFile=null, titleName=null){
-	#¶ÁÈ¡ÊäÈëÎÄ¼ş,ÌáÈ¡Êı¾İ
+	#è¯»å–è¾“å…¥æ–‡ä»¶,æå–æ•°æ®
 	rt=read.table(inputFile, header=T, sep="\t", check.names=F, row.names=1)
 	data=t(rt)
-	Project=gsub("(.*?)\\_.*", "\\1", rownames(data))            #»ñÈ¡Êı¾İÑĞ¾¿µÄid
-	Sample=gsub("(.+)\\_(.+)\\_(.+)", "\\2", rownames(data))     #»ñÈ¡ÑùÆ·µÄÃû³Æ
+	Project=gsub("(.*?)\\_.*", "\\1", rownames(data))            #è·å–æ•°æ®ç ”ç©¶çš„id
+	Sample=gsub("(.+)\\_(.+)\\_(.+)", "\\2", rownames(data))     #è·å–æ ·å“çš„åç§°
 	data=cbind(as.data.frame(data), Sample, Project)
 	
-	#°ÑÊı¾İ×ª»»³Éggplot2ÊäÈëÎÄ¼ş
+	#æŠŠæ•°æ®è½¬æ¢æˆggplot2è¾“å…¥æ–‡ä»¶
 	rt1=melt(data, id.vars=c("Project", "Sample"))
 	colnames(rt1)=c("Project","Sample","Gene","Expression")
 
-	#»æÖÆÏäÏßÍ¼
+	#ç»˜åˆ¶ç®±çº¿å›¾
 	pdf(file=outFile, width=10, height=5)
 	p=ggplot(rt1, mapping=aes(x=Sample, y=Expression))+
   		geom_boxplot(aes(fill=Project), notch=T, outlier.shape=NA)+
@@ -31,17 +31,12 @@ bioBoxplot=function(inputFile=null, outFile=null, titleName=null){
 	dev.off()
 }
 
-#µ÷ÓÃº¯Êı, »æÖÆÅú´Î½ÃÕıÇ°µÄÏäÏßÍ¼
+#è°ƒç”¨å‡½æ•°, ç»˜åˆ¶æ‰¹æ¬¡çŸ«æ­£å‰çš„ç®±çº¿å›¾
 bioBoxplot(inputFile="merge.preNorm.txt", outFile="boxplot.preNorm.pdf", titleName="Before batch correction")
-#µ÷ÓÃº¯Êı, »æÖÆÅú´Î½ÃÕıºóµÄÏäÏßÍ¼
+#è°ƒç”¨å‡½æ•°, ç»˜åˆ¶æ‰¹æ¬¡çŸ«æ­£åçš„ç®±çº¿å›¾
 bioBoxplot(inputFile="merge.normalize.txt", outFile="boxplot.normalzie.pdf", titleName="After batch correction")
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 
 

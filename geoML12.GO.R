@@ -13,7 +13,7 @@
 #BiocManager::install("ComplexHeatmap")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(clusterProfiler)
 library(org.Hs.eg.db)
 library(enrichplot)
@@ -23,48 +23,48 @@ library(RColorBrewer)
 library(dplyr)
 library(ComplexHeatmap)
 
-pvalueFilter=0.05      #pÖµµÄ¹ıÂËÌõ¼ş
-adjPvalFilter=1        #½ÃÕıºópÖµµÄ¹ıÂËÌõ¼ş
+pvalueFilter=0.05      #på€¼çš„è¿‡æ»¤æ¡ä»¶
+adjPvalFilter=1        #çŸ«æ­£åpå€¼çš„è¿‡æ»¤æ¡ä»¶
 
-#¶¨ÒåÍ¼ĞÎµÄÑÕÉ«
+#å®šä¹‰å›¾å½¢çš„é¢œè‰²
 colorSel="p.adjust"
 if(adjPvalFilter>0.05){
 	colorSel="pvalue"
 }
 
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\12.GO")      #ÉèÖÃ¹¤×÷Ä¿Â¼
-rt=read.table("interGenes.txt", header=F, sep="\t", check.names=F)     #¶ÁÈ¡½»¼¯»ùÒòµÄÁĞ±íÎÄ¼ş
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\12.GO")      #è®¾ç½®å·¥ä½œç›®å½•
+rt=read.table("interGenes.txt", header=F, sep="\t", check.names=F)     #è¯»å–äº¤é›†åŸºå› çš„åˆ—è¡¨æ–‡ä»¶
 
-#ÌáÈ¡»ùÒòµÄÃû³Æ, ½«»ùÒòÃû³Æ×ª»»Îª»ùÒòid
+#æå–åŸºå› çš„åç§°, å°†åŸºå› åç§°è½¬æ¢ä¸ºåŸºå› id
 genes=unique(as.vector(rt[,1]))
 entrezIDs=mget(genes, org.Hs.egSYMBOL2EG, ifnotfound=NA)
 entrezIDs=as.character(entrezIDs)
 rt=cbind(rt, entrezIDs)
-rt=rt[rt[,"entrezIDs"]!="NA",]      #È¥³ı»ùÒòidÎªNAµÄ»ùÒò
+rt=rt[rt[,"entrezIDs"]!="NA",]      #å»é™¤åŸºå› idä¸ºNAçš„åŸºå› 
 gene=rt$entrezID
 #gene=gsub("c\\(\"(\\d+)\".*", "\\1", gene)
 
-#GO¸»¼¯·ÖÎö
+#GOå¯Œé›†åˆ†æ
 kk=enrichGO(gene=gene, OrgDb=org.Hs.eg.db, pvalueCutoff=1, qvalueCutoff=1, ont="all", readable=T)
 GO=as.data.frame(kk)
 GO=GO[(GO$pvalue<pvalueFilter & GO$p.adjust<adjPvalFilter),]
-#Êä³öÏÔÖø¸»¼¯·ÖÎöµÄ½á¹û
+#è¾“å‡ºæ˜¾è‘—å¯Œé›†åˆ†æçš„ç»“æœ
 write.table(GO, file="GO.txt", sep="\t", quote=F, row.names = F)
 
-#Öù×´Í¼
+#æŸ±çŠ¶å›¾
 pdf(file="barplot.pdf", width=9, height=7)
 bar=barplot(kk, drop=TRUE, showCategory=10, label_format=100, split="ONTOLOGY", color=colorSel) + facet_grid(ONTOLOGY~., scale='free')
 print(bar)
 dev.off()
 		
-#ÆøÅİÍ¼
+#æ°”æ³¡å›¾
 pdf(file="bubble.pdf", width=9, height=7)
 bub=dotplot(kk, showCategory=10, orderBy="GeneRatio", label_format=100, split="ONTOLOGY", color=colorSel) + facet_grid(ONTOLOGY~., scale='free')
 print(bub)
 dev.off()
 
 
-###########»æÖÆGOÈ¦Í¼###########
+###########ç»˜åˆ¶GOåœˆå›¾###########
 ontology.col=c("#5C88DAFF", "#CE3D32FF", "#00AF66FF")
 data=GO[order(GO$pvalue),]
 datasig=data[data$pvalue<0.05,,drop=F]
@@ -77,7 +77,7 @@ MF = head(MF,6)
 data = rbind(BP,CC,MF)
 main.col = ontology.col[as.numeric(as.factor(data$ONTOLOGY))]
 
-#ÕûÀíÈ¦Í¼Êı¾İ
+#æ•´ç†åœˆå›¾æ•°æ®
 BgGene = as.numeric(sapply(strsplit(data$BgRatio,"/"),'[',1))
 Gene = as.numeric(sapply(strsplit(data$GeneRatio,'/'),'[',1))
 ratio = Gene/BgGene
@@ -92,7 +92,7 @@ bed3 = data.frame(GO=data$ID,start=1,end=Gene,BgGene=Gene)
 bed4 = data.frame(GO=data$ID,start=1,end=max(BgGene),ratio=ratio,col=main.col)
 bed4$ratio = bed4$ratio/max(bed4$ratio)*9.5
 
-#»æÖÆÈ¦Í¼Ö÷Ìå²¿·Ö
+#ç»˜åˆ¶åœˆå›¾ä¸»ä½“éƒ¨åˆ†
 pdf(file="GO.circlize.pdf", width=10, height=10)
 par(omi=c(0.1,0.1,0.1,1.5))
 circos.par(track.margin=c(0.01,0.01))
@@ -136,7 +136,7 @@ circos.genomicTrack(bed4, ylim = c(0, 10),track.height = 0.35,bg.border="white",
                       #circos.genomicText(region, value, y = 0.3, labels = value[,1], ...)
                     })
 circos.clear()
-#»æÖÆÈ¦Í¼ÖĞ¼äµÄÍ¼Àı
+#ç»˜åˆ¶åœˆå›¾ä¸­é—´çš„å›¾ä¾‹
 middle.legend = Legend(
   labels = c('Number of Genes','Number of Select','Rich Factor(0-1)'),
   type="points",pch=c(15,15,17),legend_gp = gpar(col=c('pink','#BA55D3',ontology.col[1])),
@@ -144,14 +144,14 @@ middle.legend = Legend(
 )
 circle_size = unit(1, "snpc")
 draw(middle.legend,x=circle_size*0.42)
-#»æÖÆGO·ÖÀàµÄÍ¼Àı
+#ç»˜åˆ¶GOåˆ†ç±»çš„å›¾ä¾‹
 main.legend = Legend(
   labels = c("Biological Process", "Cellular Component", "Molecular Function"),  type="points",pch=15,
   legend_gp = gpar(col=ontology.col), title_position = "topcenter",
   title = "ONTOLOGY", nrow = 3,size = unit(3, "mm"),grid_height = unit(5, "mm"),
   grid_width = unit(5, "mm")
 )
-#¸»¼¯ÏÔÖøĞÔpvalueµÄÍ¼Àı
+#å¯Œé›†æ˜¾è‘—æ€§pvalueçš„å›¾ä¾‹
 logp.legend = Legend(
   labels=c('(0,2]','(2,4]','(4,6]','(6,8]','(8,10]','>=10'),
   type="points",pch=16,legend_gp=gpar(col=logpvalue.col),title="-log10(Pvalue)",
@@ -165,11 +165,6 @@ draw(lgd, x = circle_size*0.85, y=circle_size*0.55,just = "left")
 dev.off()
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 
 

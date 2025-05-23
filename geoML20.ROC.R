@@ -2,34 +2,34 @@
 #install.packages("pROC")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(glmnet)
 library(pROC)
 
-expFile="merge.normalize.txt"      #±í´ïÊı¾İÎÄ¼ş
-geneFile="modelGene.list.txt"      #»ùÒòÁĞ±íÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\20.geneROC")    #ÉèÖÃ¹¤×÷Ä¿Â¼
+expFile="merge.normalize.txt"      #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+geneFile="modelGene.list.txt"      #åŸºå› åˆ—è¡¨æ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\20.geneROC")    #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡±í´ïÊı¾İÎÄ¼ş
+#è¯»å–è¡¨è¾¾æ•°æ®æ–‡ä»¶
 rt=read.table(expFile, header=T, sep="\t", check.names=F, row.names=1)
 
-#ÌáÈ¡ÑùÆ·µÄ·Ö×éĞÅÏ¢(¶ÔÕÕ×éºÍÊµÑé×é)
+#æå–æ ·å“çš„åˆ†ç»„ä¿¡æ¯(å¯¹ç…§ç»„å’Œå®éªŒç»„)
 y=gsub("(.*)\\_(.*)\\_(.*)", "\\3", colnames(rt))
 y=ifelse(y=="Control", 0, 1)
 
-#¶ÁÈ¡»ùÒòÁĞ±íÎÄ¼ş
+#è¯»å–åŸºå› åˆ—è¡¨æ–‡ä»¶
 geneRT=read.table(geneFile, header=F, sep="\t", check.names=F)
 
-#¶¨ÒåÍ¼ĞÎµÄÑÕÉ«
+#å®šä¹‰å›¾å½¢çš„é¢œè‰²
 bioCol=rainbow(nrow(geneRT), s=0.9, v=0.9)
 
-#¶Ô»ùÒò½øĞĞÑ­»·£¬»æÖÆROCÇúÏß
+#å¯¹åŸºå› è¿›è¡Œå¾ªç¯ï¼Œç»˜åˆ¶ROCæ›²çº¿
 aucText=c()
 k=0
 for(x in as.vector(geneRT[,1])){
 	k=k+1
-	#»æÖÆROCÇúÏß
-	roc1=roc(y, as.numeric(rt[x,]))     #µÃµ½ROCÇúÏßµÄ²ÎÊı
+	#ç»˜åˆ¶ROCæ›²çº¿
+	roc1=roc(y, as.numeric(rt[x,]))     #å¾—åˆ°ROCæ›²çº¿çš„å‚æ•°
 	if(k==1){
 		pdf(file="ROC.genes.pdf", width=5, height=4.5)
 		plot(roc1, print.auc=F, col=bioCol[k], legacy.axes=T, main="", lwd=3)
@@ -39,16 +39,9 @@ for(x in as.vector(geneRT[,1])){
 		aucText=c(aucText, paste0(x,", AUC=",sprintf("%.3f",roc1$auc[1])))
 	}
 }
-#»æÖÆÍ¼Àı£¬µÃµ½ROCÇúÏßÏÂµÄÃæ»ı
+#ç»˜åˆ¶å›¾ä¾‹ï¼Œå¾—åˆ°ROCæ›²çº¿ä¸‹çš„é¢ç§¯
 legend("bottomright", aucText, lwd=3, bty="n", cex=0.8, col=bioCol[1:(ncol(rt)-1)])
 dev.off()
 
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

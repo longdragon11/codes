@@ -10,19 +10,19 @@
 #devtools::install_github("Hy4m/linkET", force = TRUE)
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(linkET)
 
-expFile="merge.normalize.txt"       #±í´ïÊı¾İÎÄ¼ş
-geneFile="modelGene.list.txt"       #»ùÒòÁĞ±íÎÄ¼ş
-immFile="CIBERSORT-Results.txt"     #ÃâÒßÏ¸°û½şÈóµÄ½á¹ûÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\27.linkET")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+expFile="merge.normalize.txt"       #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+geneFile="modelGene.list.txt"       #åŸºå› åˆ—è¡¨æ–‡ä»¶
+immFile="CIBERSORT-Results.txt"     #å…ç–«ç»†èƒæµ¸æ¶¦çš„ç»“æœæ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\27.linkET")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡±í´ïÊı¾İÎÄ¼ş,²¢¶ÔÊäÈëÎÄ¼ş½øĞĞÕûÀí
+#è¯»å–è¡¨è¾¾æ•°æ®æ–‡ä»¶,å¹¶å¯¹è¾“å…¥æ–‡ä»¶è¿›è¡Œæ•´ç†
 rt=read.table(expFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -31,18 +31,18 @@ dimnames=list(rownames(exp),colnames(exp))
 data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 data=avereps(data)
 
-#¶ÁÈ¡»ùÒòÁĞ±íÎÄ¼ş, ÌáÈ¡Ä£ĞÍ»ùÒòµÄ±í´ïÁ¿
+#è¯»å–åŸºå› åˆ—è¡¨æ–‡ä»¶, æå–æ¨¡å‹åŸºå› çš„è¡¨è¾¾é‡
 geneRT=read.table(geneFile, header=F, sep="\t", check.names=F)
 data=data[as.vector(geneRT[,1]),]
 
-#È¥³ı¶ÔÕÕ×éÑùÆ·
+#å»é™¤å¯¹ç…§ç»„æ ·å“
 group=gsub("(.*)\\_(.*?)", "\\", colnames(data))
 data=data[,group=="Treat",drop=F]
 data=t(data)
 
-#¶ÁÈ¡ÃâÒßÏ¸°û½á¹ûÎÄ¼ş£¬²¢¶ÔÊı¾İ½øĞĞÕûÀí
+#è¯»å–å…ç–«ç»†èƒç»“æœæ–‡ä»¶ï¼Œå¹¶å¯¹æ•°æ®è¿›è¡Œæ•´ç†
 immune=read.table(immFile, header=T, sep="\t", check.names=F, row.names=1)
-#¶Ô±í´ïÊı¾İºÍÃâÒßÏ¸°ûÊı¾İÈ¡½»¼¯
+#å¯¹è¡¨è¾¾æ•°æ®å’Œå…ç–«ç»†èƒæ•°æ®å–äº¤é›†
 sameSample=intersect(row.names(data), row.names(immune))
 data=data[sameSample,,drop=F]
 immune=immune[sameSample,,drop=F]
@@ -50,7 +50,7 @@ immune=immune[,apply(immune,2,sd)>0]
 geneLists=list()
 for(i in 1:ncol(data)){geneLists[[colnames(data)[i]]]=i}
 
-#»ùÒòÓëÃâÒßÏ¸°ûÏà¹ØĞÔ·ÖÎö
+#åŸºå› ä¸å…ç–«ç»†èƒç›¸å…³æ€§åˆ†æ
 geneCor=data.frame()
 for(cell in colnames(immune)){
 	if(sd(immune[,cell])==0){next}
@@ -70,14 +70,14 @@ geneCor$r=abs(geneCor$r)
 geneCor=geneCor %>% mutate(rd = cut(r, breaks = c(-Inf, 0.2, 0.4, 0.6, Inf),
                   labels = c("< 0.2", "0.2 - 0.4", "0.4 - 0.6",">= 0.6")))
 
-#»æÖÆÍ¼ĞÎ
+#ç»˜åˆ¶å›¾å½¢
 qcorPlot=qcorrplot(correlate(immune, method="spearman"), type = "lower", diag = FALSE) +
   geom_square() +
   #geom_mark(sep = '\n', size = 1, sig_level = c(0.05, 0.01, 0.001), sig_thres = 0.05, color="black") +
   geom_couple(aes(colour = pd, size = rd), 
               data = geneCor, 
               curvature = nice_curvature()) +
-  #ÉèÖÃÍ¼ĞÎµÄÑÕÉ«ºÍÍ¼ÀıµÄÃû³Æ
+  #è®¾ç½®å›¾å½¢çš„é¢œè‰²å’Œå›¾ä¾‹çš„åç§°
   scale_fill_gradientn(colours = rev(RColorBrewer::brewer.pal(11, "RdBu"))) +
   scale_size_manual(values = c(0.5, 1.5, 2, 3)) +
   scale_colour_manual(values = c("#1B9E77", "#CCCCCC99", "#D95F02")) +
@@ -89,16 +89,8 @@ qcorPlot=qcorrplot(correlate(immune, method="spearman"), type = "lower", diag = 
                                order = 1),
          fill = guide_colorbar(title = "Cell-cell cor", order = 3))
 
-#Êä³öÍ¼ĞÎ
+#è¾“å‡ºå›¾å½¢
 pdf(file="linkET.pdf", width=9, height=7)
 print(qcorPlot)
 dev.off()
-
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 

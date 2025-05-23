@@ -6,31 +6,31 @@
 #BiocManager::install("sva")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(sva)
-setwd("C:\\Users\\19809\\Desktop\\MR\\Êı¾İºÏ²¢")      #ÉèÖÃ¹¤×÷Ä¿Â¼
+setwd("C:\\Users\\19809\\Desktop\\MR\\æ•°æ®åˆå¹¶")      #è®¾ç½®å·¥ä½œç›®å½•
 
-#»ñÈ¡Ä¿Â¼ÏÂËùÓĞ"normalize.txt"½áÎ²µÄÎÄ¼ş
+#è·å–ç›®å½•ä¸‹æ‰€æœ‰"normalize.txt"ç»“å°¾çš„æ–‡ä»¶
 files=dir()
 files=grep("normalize.txt$", files, value=T)
 geneList=list()
 
-#¶ÁÈ¡ËùÓĞtxtÎÄ¼şÖĞµÄ»ùÒòĞÅÏ¢£¬±£´æµ½geneList
+#è¯»å–æ‰€æœ‰txtæ–‡ä»¶ä¸­çš„åŸºå› ä¿¡æ¯ï¼Œä¿å­˜åˆ°geneList
 for(file in files){
 	if(file=="merge.preNorm.txt"){next}
 	if(file=="merge.normalize.txt"){next}
-    rt=read.table(file, header=T, sep="\t", check.names=F)      #¶ÁÈ¡ÊäÈëÎÄ¼ş
-    geneNames=as.vector(rt[,1])      #ÌáÈ¡»ùÒòÃû³Æ
-    uniqGene=unique(geneNames)       #»ùÒòÈ¡unique
+    rt=read.table(file, header=T, sep="\t", check.names=F)      #è¯»å–è¾“å…¥æ–‡ä»¶
+    geneNames=as.vector(rt[,1])      #æå–åŸºå› åç§°
+    uniqGene=unique(geneNames)       #åŸºå› å–unique
     header=unlist(strsplit(file, "\\.|\\-"))
     geneList[[header[1]]]=uniqGene
 }
 
-#»ñÈ¡½»¼¯»ùÒò
+#è·å–äº¤é›†åŸºå› 
 interGenes=Reduce(intersect, geneList)
 
-#Êı¾İºÏ²¢
+#æ•°æ®åˆå¹¶
 allTab=data.frame()
 batchType=c()
 for(i in 1:length(files)){
@@ -38,7 +38,7 @@ for(i in 1:length(files)){
 	if(inputFile=="merge.preNorm.txt"){next}
 	if(inputFile=="merge.normalize.txt"){next}
     header=unlist(strsplit(inputFile, "\\.|\\-"))
-    #¶ÁÈ¡ÊäÈëÎÄ¼ş£¬²¢¶ÔÊäÈëÎÄ¼ş½øĞĞÕûÀí
+    #è¯»å–è¾“å…¥æ–‡ä»¶ï¼Œå¹¶å¯¹è¾“å…¥æ–‡ä»¶è¿›è¡Œæ•´ç†
     rt=read.table(inputFile, header=T, sep="\t", check.names=F)
     rt=as.matrix(rt)
     rownames(rt)=rt[,1]
@@ -48,7 +48,7 @@ for(i in 1:length(files)){
     rt=avereps(data)
     colnames(rt)=paste0(header[1], "_", colnames(rt))
 
-    #Êı¾İºÏ²¢
+    #æ•°æ®åˆå¹¶
     if(i==1){
     	allTab=rt[interGenes,]
     }else{
@@ -57,21 +57,16 @@ for(i in 1:length(files)){
     batchType=c(batchType, rep(i,ncol(rt)))
 }
 
-#Êä³öºÏ²¢ºóµÄ±í´ïÊı¾İ
+#è¾“å‡ºåˆå¹¶åçš„è¡¨è¾¾æ•°æ®
 outTab=rbind(geneNames=colnames(allTab), allTab)
 write.table(outTab, file="merge.preNorm.txt", sep="\t", quote=F, col.names=F)
 
-#¶ÔºÏ²¢ºóÊı¾İ½øĞĞÅú´Î½ÃÕı£¬Êä³öÅú´Î½ÃÕıºóµÄ±í´ïÊı¾İ
+#å¯¹åˆå¹¶åæ•°æ®è¿›è¡Œæ‰¹æ¬¡çŸ«æ­£ï¼Œè¾“å‡ºæ‰¹æ¬¡çŸ«æ­£åçš„è¡¨è¾¾æ•°æ®
 outTab=ComBat(allTab, batchType, par.prior=TRUE)
 outTab=rbind(geneNames=colnames(outTab), outTab)
 write.table(outTab, file="merge.normalize.txt", sep="\t", quote=F, col.names=F)
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 
 

@@ -1,15 +1,15 @@
-rsFile="model.classMatrix.txt"      #·ÖÀàµÄ¾ØÕóÎÄ¼ş
-method="glmBoost+RF"                #Ñ¡Ôñ»úÆ÷Ñ§Ï°µÄ·½·¨(ĞèÒª¸ù¾İÈÈÍ¼½øĞĞĞŞ¸Ä)
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\17.confusion")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+rsFile="model.classMatrix.txt"      #åˆ†ç±»çš„çŸ©é˜µæ–‡ä»¶
+method="glmBoost+RF"                #é€‰æ‹©æœºå™¨å­¦ä¹ çš„æ–¹æ³•(éœ€è¦æ ¹æ®çƒ­å›¾è¿›è¡Œä¿®æ”¹)
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\17.confusion")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡·ÖÀàµÄ¾ØÕóÎÄ¼ş
+#è¯»å–åˆ†ç±»çš„çŸ©é˜µæ–‡ä»¶
 riskRT=read.table(rsFile, header=T, sep="\t", check.names=F, row.names=1)
-#ÌáÈ¡Êı¾İ¼¯µÄID
+#æå–æ•°æ®é›†çš„ID
 CohortID=gsub("(.*)\\_(.*)\\_(.*)", "\\1", rownames(riskRT))
 CohortID=gsub("(.*)\\.(.*)", "\\1", CohortID)
 riskRT$Cohort=CohortID
 
-#¶¨Òå»ìÏı¾ØÕóµÄº¯Êı
+#å®šä¹‰æ··æ·†çŸ©é˜µçš„å‡½æ•°
 draw_confusion_matrix <- function(cm=null, titleName=null) {
 #	layout(matrix(c(1,1,2)))
 	par(mar=c(2,2,3,2))
@@ -36,14 +36,14 @@ draw_confusion_matrix <- function(cm=null, titleName=null) {
 	text(295, 335, res[4], cex=1.6, font=2, col='white')
 }
 
-#¶ÔÊı¾İ¼¯½øĞĞÑ­»·
+#å¯¹æ•°æ®é›†è¿›è¡Œå¾ªç¯
 for(Cohort in unique(riskRT$Cohort)){
-	#ÌáÈ¡ÑùÆ·µÄ·Ö×éĞÅÏ¢(¶ÔÕÕ×éºÍÊµÑé×é)
+	#æå–æ ·å“çš„åˆ†ç»„ä¿¡æ¯(å¯¹ç…§ç»„å’Œå®éªŒç»„)
 	rt=riskRT[riskRT$Cohort==Cohort,]
 	y=gsub("(.*)\\_(.*)\\_(.*)", "\\3", row.names(rt))
 	y=ifelse(y=="Control", 0, 1)
 	
-	#»ìÏı¾ØÕó
+	#æ··æ·†çŸ©é˜µ
 	result_matrix=table(rt[,method], y)
 	pdf(file=paste0("confusion.", Cohort, ".pdf"), width=6, height=5)
 	draw_confusion_matrix(cm=result_matrix, titleName=Cohort)
@@ -51,11 +51,6 @@ for(Cohort in unique(riskRT$Cohort)){
 }
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
+
 
 

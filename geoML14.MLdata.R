@@ -7,37 +7,37 @@
 #BiocManager::install("sva")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(sva)
 
-geneFile="interGenes.txt"      #»ùÒòÁĞ±íÎÄ¼ş
-setwd("C:\\Users\\lexb\\Desktop\\geoML\\14.MLdata")      #ÉèÖÃ¹¤×÷Ä¿Â¼
+geneFile="interGenes.txt"      #åŸºå› åˆ—è¡¨æ–‡ä»¶
+setwd("C:\\Users\\lexb\\Desktop\\geoML\\14.MLdata")      #è®¾ç½®å·¥ä½œç›®å½•
 
-#»ñÈ¡Ä¿Â¼ÏÂËùÓĞ"normalize.txt"½áÎ²µÄÎÄ¼ş
+#è·å–ç›®å½•ä¸‹æ‰€æœ‰"normalize.txt"ç»“å°¾çš„æ–‡ä»¶
 files=dir()
 files=grep("normalize.txt$", files, value=T)
 geneList=list()
 
-#¶ÁÈ¡ËùÓĞ±í´ïÊı¾İÎÄ¼şÖĞµÄ»ùÒòĞÅÏ¢£¬±£´æµ½geneList
+#è¯»å–æ‰€æœ‰è¡¨è¾¾æ•°æ®æ–‡ä»¶ä¸­çš„åŸºå› ä¿¡æ¯ï¼Œä¿å­˜åˆ°geneList
 for(file in files){
-    rt=read.table(file, header=T, sep="\t", check.names=F)      #¶ÁÈ¡ÊäÈëÎÄ¼ş
-    geneNames=as.vector(rt[,1])      #ÌáÈ¡»ùÒòÃû³Æ
-    uniqGene=unique(geneNames)       #»ùÒòÈ¡unique
+    rt=read.table(file, header=T, sep="\t", check.names=F)      #è¯»å–è¾“å…¥æ–‡ä»¶
+    geneNames=as.vector(rt[,1])      #æå–åŸºå› åç§°
+    uniqGene=unique(geneNames)       #åŸºå› å–unique
     header=unlist(strsplit(file, "\\.|\\-"))
     geneList[[header[1]]]=uniqGene
 }
 
-#»ñÈ¡±í´ïÊı¾İµÄ½»¼¯»ùÒò
+#è·å–è¡¨è¾¾æ•°æ®çš„äº¤é›†åŸºå› 
 interGenes=Reduce(intersect, geneList)
 
-#Êı¾İºÏ²¢
+#æ•°æ®åˆå¹¶
 allTab=data.frame()
 batchType=c()
 for(i in 1:length(files)){
     inputFile=files[i]
     header=unlist(strsplit(inputFile, "\\.|\\-"))
-    #¶ÁÈ¡ÊäÈëÎÄ¼ş£¬²¢¶ÔÊäÈëÎÄ¼ş½øĞĞÕûÀí
+    #è¯»å–è¾“å…¥æ–‡ä»¶ï¼Œå¹¶å¯¹è¾“å…¥æ–‡ä»¶è¿›è¡Œæ•´ç†
     rt=read.table(inputFile, header=T, sep="\t", check.names=F)
     rt=as.matrix(rt)
     rownames(rt)=rt[,1]
@@ -47,7 +47,7 @@ for(i in 1:length(files)){
     rt=avereps(data)
     colnames(rt)=paste0(header[1], "_", colnames(rt))
 
-    #Êı¾İºÏ²¢
+    #æ•°æ®åˆå¹¶
     if(i==1){
     	allTab=rt[interGenes,]
     }else{
@@ -56,13 +56,13 @@ for(i in 1:length(files)){
     batchType=c(batchType, rep(i,ncol(rt)))
 }
 
-#ÌáÈ¡½»¼¯»ùÒòµÄ±í´ïÁ¿
+#æå–äº¤é›†åŸºå› çš„è¡¨è¾¾é‡
 svaTab=ComBat(allTab, batchType, par.prior=TRUE)
 geneRT=read.table(geneFile, header=F, sep="\t", check.names=F)
 geneTab=svaTab[intersect(row.names(svaTab), as.vector(geneRT[,1])),]
 geneTab=t(geneTab)
 
-#ÌáÈ¡ÑµÁ·×éºÍÑéÖ¤×éµÄÊı¾İ
+#æå–è®­ç»ƒç»„å’ŒéªŒè¯ç»„çš„æ•°æ®
 train=grepl("^merge", rownames(geneTab), ignore.case=T)
 trainExp=geneTab[train,,drop=F]
 testExp=geneTab[!train,,drop=F]
@@ -74,18 +74,12 @@ testType=ifelse(testType=="Control", 0, 1)
 trainExp=cbind(trainExp, Type=trainType)
 testExp=cbind(testExp, Type=testType)
 
-#Êä³öÑµÁ·×éºÍÑéÖ¤×éµÄÊı¾İ
+#è¾“å‡ºè®­ç»ƒç»„å’ŒéªŒè¯ç»„çš„æ•°æ®
 trainOut=rbind(id=colnames(trainExp), trainExp)
 write.table(trainOut, file="data.train.txt", sep="\t", quote=F, col.names=F)
 testOut=rbind(id=colnames(testExp), testExp)
 write.table(testOut, file="data.test.txt", sep="\t", quote=F, col.names=F)
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

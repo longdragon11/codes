@@ -6,18 +6,18 @@
 #install.packages("ggplot2")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(dplyr)
 library(pheatmap)
 library(ggplot2)
 
-logFCfilter=0.585          #logFCµÄ¹ıÂËÌõ¼ş(logFC=0.585,²îÒì±¶Êı1.5±¶;logFC=1,²îÒì2±¶;logFC=2,²îÒì4±¶)
-adj.P.Val.Filter=0.1   #½ÃÕıºópÖµµÄ¹ıÂËÌõ¼ş
-inputFile="merge.normalize.txt"      #±í´ïÊı¾İÎÄ¼ş
-setwd("C:\\Users\\19809\\Desktop\\MR\\²îÒì·ÖÎö")      #ÉèÖÃ¹¤×÷Ä¿Â¼
+logFCfilter=0.585          #logFCçš„è¿‡æ»¤æ¡ä»¶(logFC=0.585,å·®å¼‚å€æ•°1.5å€;logFC=1,å·®å¼‚2å€;logFC=2,å·®å¼‚4å€)
+adj.P.Val.Filter=0.1   #çŸ«æ­£åpå€¼çš„è¿‡æ»¤æ¡ä»¶
+inputFile="merge.normalize.txt"      #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+setwd("C:\\Users\\19809\\Desktop\\MR\\å·®å¼‚åˆ†æ")      #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡ÊäÈëÎÄ¼ş£¬²¢¶ÔÊäÈëÎÄ¼şÕûÀí
+#è¯»å–è¾“å…¥æ–‡ä»¶ï¼Œå¹¶å¯¹è¾“å…¥æ–‡ä»¶æ•´ç†
 rt=read.table(inputFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -26,14 +26,14 @@ dimnames=list(rownames(exp),colnames(exp))
 data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 data=avereps(data)
 
-#»ñÈ¡ÑùÆ·µÄ·Ö×éĞÅÏ¢
+#è·å–æ ·å“çš„åˆ†ç»„ä¿¡æ¯
 Type=gsub("(.*)\\_(.*)\\_(.*)", "\\3", colnames(data))
-data=data[,order(Type)]       #¸ù¾İÑùÆ·µÄ·Ö×éĞÅÏ¢¶ÔÑùÆ·½øĞĞÅÅĞò
-Project=gsub("(.+)\\_(.+)\\_(.+)", "\\1", colnames(data))    #»ñµÃGEOÊı¾İÑĞ¾¿µÄid
+data=data[,order(Type)]       #æ ¹æ®æ ·å“çš„åˆ†ç»„ä¿¡æ¯å¯¹æ ·å“è¿›è¡Œæ’åº
+Project=gsub("(.+)\\_(.+)\\_(.+)", "\\1", colnames(data))    #è·å¾—GEOæ•°æ®ç ”ç©¶çš„id
 Type=gsub("(.*)\\_(.*)\\_(.*)", "\\3", colnames(data))
 colnames(data)=gsub("(.+)\\_(.+)\\_(.+)", "\\2", colnames(data))
 
-#²îÒì·ÖÎö
+#å·®å¼‚åˆ†æ
 design <- model.matrix(~0+factor(Type))
 colnames(design) <- c("Control","Treat")
 fit <- lmFit(data,design)
@@ -41,23 +41,23 @@ cont.matrix<-makeContrasts(Treat-Control,levels=design)
 fit2 <- contrasts.fit(fit, cont.matrix)
 fit2 <- eBayes(fit2)
 
-#Êä³öËùÓĞ»ùÒòµÄ²îÒìÇé¿ö
+#è¾“å‡ºæ‰€æœ‰åŸºå› çš„å·®å¼‚æƒ…å†µ
 allDiff=topTable(fit2,adjust='fdr',number=200000)
 allDiffOut=rbind(id=colnames(allDiff),allDiff)
 write.table(allDiffOut, file="all.txt", sep="\t", quote=F, col.names=F)
 
-#Êä³öÏÔÖøµÄ²îÒì»ùÒò
+#è¾“å‡ºæ˜¾è‘—çš„å·®å¼‚åŸºå› 
 diffSig=allDiff[with(allDiff, (abs(logFC)>logFCfilter & adj.P.Val < adj.P.Val.Filter )), ]
 diffSigOut=rbind(id=colnames(diffSig),diffSig)
 write.table(diffSigOut, file="diff.txt", sep="\t", quote=F, col.names=F)
 
-#Êä³ö²îÒì»ùÒò±í´ïÁ¿
+#è¾“å‡ºå·®å¼‚åŸºå› è¡¨è¾¾é‡
 diffGeneExp=data[row.names(diffSig),]
 diffGeneExpOut=rbind(id=paste0(colnames(diffGeneExp),"_",Type), diffGeneExp)
 write.table(diffGeneExpOut, file="diffGeneExp.txt", sep="\t", quote=F, col.names=F)
 
-#»æÖÆ²îÒì»ùÒòÈÈÍ¼
-geneNum=50     #¶¨ÒåÕ¹Ê¾»ùÒòµÄÊıÄ¿
+#ç»˜åˆ¶å·®å¼‚åŸºå› çƒ­å›¾
+geneNum=50     #å®šä¹‰å±•ç¤ºåŸºå› çš„æ•°ç›®
 diffUp=diffSig[diffSig$logFC>0,]
 diffDown=diffSig[diffSig$logFC<0,]
 geneUp=row.names(diffUp)
@@ -65,11 +65,11 @@ geneDown=row.names(diffDown)
 if(nrow(diffUp)>geneNum){geneUp=row.names(diffUp)[1:geneNum]}
 if(nrow(diffDown)>geneNum){geneDown=row.names(diffDown)[1:geneNum]}
 hmExp=data[c(geneUp,geneDown),]
-#×¼±¸×¢ÊÍÎÄ¼ş
+#å‡†å¤‡æ³¨é‡Šæ–‡ä»¶
 names(Type)=colnames(data)
 Type=as.data.frame(Type)
 Type=cbind(Project, Type)
-#Êä³öÍ¼ĞÎ
+#è¾“å‡ºå›¾å½¢
 pdf(file="heatmap.pdf", width=10, height=7)
 pheatmap(hmExp, 
          annotation_col=Type, 
@@ -83,27 +83,21 @@ pheatmap(hmExp,
 dev.off()
 
 
-#¶¨ÒåÏÔÖøĞÔ
+#å®šä¹‰æ˜¾è‘—æ€§
 rt=read.table("all.txt", header=T, sep="\t", check.names=F)
 Sig=ifelse((rt$adj.P.Val<adj.P.Val.Filter) & (abs(rt$logFC)>logFCfilter), ifelse(rt$logFC>logFCfilter,"Up","Down"), "Not")
-#»æÖÆ»ğÉ½Í¼
+#ç»˜åˆ¶ç«å±±å›¾
 rt = mutate(rt, Sig=Sig)
 p = ggplot(rt, aes(logFC, -log10(adj.P.Val)))+
     geom_point(aes(col=Sig))+
     scale_color_manual(values=c("green2", "grey","red2"))+
     labs(title = " ")+ theme_bw()+ 
     theme(plot.title = element_text(size=16, hjust=0.5, face = "bold"))
-#Êä³öÍ¼ĞÎ
+#è¾“å‡ºå›¾å½¢
 pdf(file="vol.pdf", width=5.5, height=4.5)
 print(p)
 dev.off()
 
 
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 

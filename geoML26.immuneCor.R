@@ -7,18 +7,18 @@
 #install.packages("ggExtra")
 
 
-#ÒıÓÃ°ü
+#å¼•ç”¨åŒ…
 library(limma)
 library(reshape2)
 library(ggpubr)
 library(ggExtra)
 
-gene="FIBP"                         #»ùÒòµÄÃû³Æ(¸ù¾İÑĞ¾¿µÄÄ¿±ê»ùÒò½øĞĞĞŞ¸Ä)
-expFile="merge.normalize.txt"       #±í´ïÊı¾İÎÄ¼ş
-immFile="CIBERSORT-Results.txt"     #ÃâÒßÏ¸°û½şÈó½á¹ûÎÄ¼ş
-setwd("C:\\Users\\19809\\Desktop\\MR\\26.immuneCor")     #ÉèÖÃ¹¤×÷Ä¿Â¼
+gene="FIBP"                         #åŸºå› çš„åç§°(æ ¹æ®ç ”ç©¶çš„ç›®æ ‡åŸºå› è¿›è¡Œä¿®æ”¹)
+expFile="merge.normalize.txt"       #è¡¨è¾¾æ•°æ®æ–‡ä»¶
+immFile="CIBERSORT-Results.txt"     #å…ç–«ç»†èƒæµ¸æ¶¦ç»“æœæ–‡ä»¶
+setwd("C:\\Users\\19809\\Desktop\\MR\\26.immuneCor")     #è®¾ç½®å·¥ä½œç›®å½•
 
-#¶ÁÈ¡±í´ïÊı¾İÎÄ¼ş,²¢¶ÔÊı¾İ½øĞĞ´¦Àí
+#è¯»å–è¡¨è¾¾æ•°æ®æ–‡ä»¶,å¹¶å¯¹æ•°æ®è¿›è¡Œå¤„ç†
 rt=read.table(expFile, header=T, sep="\t", check.names=F)
 rt=as.matrix(rt)
 rownames(rt)=rt[,1]
@@ -27,22 +27,22 @@ dimnames=list(rownames(exp),colnames(exp))
 data=matrix(as.numeric(as.matrix(exp)),nrow=nrow(exp),dimnames=dimnames)
 data=avereps(data)
 
-#È¥³ı¶ÔÕÕ×éµÄÑùÆ·
+#å»é™¤å¯¹ç…§ç»„çš„æ ·å“
 Type=gsub("(.*)\\_(.*)\\_(.*)", "\\3", colnames(data))
 data=data[,Type=="Treat",drop=F]
 
-#ÌáÈ¡Ä¿±ê»ùÒòµÄ±í´ïÁ¿
+#æå–ç›®æ ‡åŸºå› çš„è¡¨è¾¾é‡
 data=t(data[gene,,drop=F])
 data=as.data.frame(data)
 
-#¶ÁÈ¡ÃâÒßÏ¸°û½şÈóµÄ½á¹ûÎÄ¼ş
+#è¯»å–å…ç–«ç»†èƒæµ¸æ¶¦çš„ç»“æœæ–‡ä»¶
 immune=read.table(immFile, header=T, sep="\t", check.names=F, row.names=1)
 
-#Êı¾İºÏ²¢
+#æ•°æ®åˆå¹¶
 sameSample=intersect(row.names(immune), row.names(data))
 rt=cbind(immune[sameSample,,drop=F], data[sameSample,,drop=F])
 
-#¶ÔÃâÒßÏ¸°û½øĞĞÑ­»·£¬»æÖÆÏà¹ØĞÔÉ¢µãÍ¼
+#å¯¹å…ç–«ç»†èƒè¿›è¡Œå¾ªç¯ï¼Œç»˜åˆ¶ç›¸å…³æ€§æ•£ç‚¹å›¾
 outTab=data.frame()
 for(i in colnames(rt)[1:(ncol(rt)-1)]){
 	x=as.numeric(rt[,gene])
@@ -53,7 +53,7 @@ for(i in colnames(rt)[1:(ncol(rt)-1)]){
 	outVector=cbind(Gene=gene, Cell=i, cor=cor$estimate, pvalue=cor$p.value)
 	outTab=rbind(outTab,outVector)
 	
-	#¶ÔÂú×ãÌõ¼şµÄÃâÒßÏ¸°û½øĞĞ¿ÉÊÓ»¯, »æÖÆÏà¹ØĞÔÍ¼ĞÎ
+	#å¯¹æ»¡è¶³æ¡ä»¶çš„å…ç–«ç»†èƒè¿›è¡Œå¯è§†åŒ–, ç»˜åˆ¶ç›¸å…³æ€§å›¾å½¢
 	if(cor$p.value<0.05){
 		outFile=paste0("cor.", i, ".pdf")
 		df1=as.data.frame(cbind(x,y))
@@ -62,21 +62,21 @@ for(i in colnames(rt)[1:(ncol(rt)-1)]){
 				  geom_point() + geom_smooth(method="lm",formula = y ~ x) + theme_bw()+
 				  stat_cor(method = 'spearman', aes(x =x, y =y))
 		p2=ggMarginal(p1, type="density", xparams=list(fill = "#FD7446FF"), yparams=list(fill = "#3B4992FF"))
-		#Ïà¹ØĞÔÍ¼ĞÎ
+		#ç›¸å…³æ€§å›¾å½¢
 		pdf(file=outFile, width=5, height=4.3)
 		print(p2)
 		dev.off()
 	}
 }
-#Êä³öÃâÒßÏ¸°ûÏà¹ØĞÔµÄ±í¸ñÎÄ¼ş
+#è¾“å‡ºå…ç–«ç»†èƒç›¸å…³æ€§çš„è¡¨æ ¼æ–‡ä»¶
 write.table(outTab,file="cor.result.txt",sep="\t",row.names=F,quote=F)
 
 
-#####################»æÖÆÏà¹ØĞÔ°ô°ôÌÇÍ¼#####################
-#¶ÁÈ¡Ïà¹ØĞÔµÄ½á¹û
+#####################ç»˜åˆ¶ç›¸å…³æ€§æ£’æ£’ç³–å›¾#####################
+#è¯»å–ç›¸å…³æ€§çš„ç»“æœ
 data = read.table("cor.result.txt", header=T, sep="\t", check.names=F)
 
-#¶¨ÒåÔ²È¦ÑÕÉ«µÄº¯Êı
+#å®šä¹‰åœ†åœˆé¢œè‰²çš„å‡½æ•°
 p.col = c('gold','pink','orange','LimeGreen','darkgreen')
 fcolor = function(x,p.col){
   color = ifelse(x>0.8,p.col[1],ifelse(x>0.6,p.col[2],ifelse(x>0.4,p.col[3],
@@ -85,7 +85,7 @@ fcolor = function(x,p.col){
   return(color)
 }
 
-#¶¨ÒåÉèÖÃÔ²È¦´óĞ¡µÄº¯Êı
+#å®šä¹‰è®¾ç½®åœ†åœˆå¤§å°çš„å‡½æ•°
 p.cex = seq(2.5, 5.5, length=5)
 fcex = function(x){
   x=abs(x)
@@ -94,53 +94,45 @@ fcex = function(x){
   return(cex)
 }
 
-#¸ù¾İÏà¹ØĞÔ¼ìÑéµÄpvalue¶¨ÒåÔ²È¦ÑÕÉ«
+#æ ¹æ®ç›¸å…³æ€§æ£€éªŒçš„pvalueå®šä¹‰åœ†åœˆé¢œè‰²
 points.color = fcolor(x=data$pvalue,p.col=p.col)
 data$points.color = points.color
 
-#¸ù¾İÏà¹ØÏµÊı¶¨ÒåÔ²È¦´óĞ¡
+#æ ¹æ®ç›¸å…³ç³»æ•°å®šä¹‰åœ†åœˆå¤§å°
 points.cex = fcex(x=data$cor)
 data$points.cex = points.cex
 data=data[order(data$cor),]
 
-########»æÖÆÍ¼ĞÎ########
-pdf(file="Lollipop.pdf", width=9.5, height=7)      #Êä³öÍ¼ĞÎ
-xlim = ceiling(max(abs(data$cor))*10)/10           #¶¨ÒåxÖá·¶Î§
+########ç»˜åˆ¶å›¾å½¢########
+pdf(file="Lollipop.pdf", width=9.5, height=7)      #è¾“å‡ºå›¾å½¢
+xlim = ceiling(max(abs(data$cor))*10)/10           #å®šä¹‰xè½´èŒƒå›´
 layout(mat=matrix(c(1,1,1,1,1,0,2,0,3,0),nc=2),width=c(8,2.2),heights=c(1,2,1,2,1))
 par(bg="white",las=1,mar=c(5,18,2,4),cex.axis=1.5,cex.lab=2)
 plot(1,type="n",xlim=c(-xlim,xlim),ylim=c(0.5,nrow(data)+0.5),xlab="Correlation Coefficient",ylab="",yaxt="n",yaxs="i",axes=F)
 rect(par('usr')[1],par('usr')[3],par('usr')[2],par('usr')[4],col="#F5F5F5",border="#F5F5F5")
 grid(ny=nrow(data),col="white",lty=1,lwd=2)
-#ÔÚÍ¼ĞÎÖĞÔö¼ÓÏß¶Î
+#åœ¨å›¾å½¢ä¸­å¢åŠ çº¿æ®µ
 segments(x0=data$cor,y0=1:nrow(data),x1=0,y1=1:nrow(data),lwd=4)
-#ÔÚÍ¼ĞÎÖĞÔö¼ÓÔ²È¦
+#åœ¨å›¾å½¢ä¸­å¢åŠ åœ†åœˆ
 points(x=data$cor,y = 1:nrow(data),col = data$points.color,pch=16,cex=data$points.cex)
-#ÔÚÍ¼ĞÎÖĞÕ¹Ê¾ÃâÒßÏ¸°ûµÄÃû³Æ
+#åœ¨å›¾å½¢ä¸­å±•ç¤ºå…ç–«ç»†èƒçš„åç§°
 text(par('usr')[1],1:nrow(data),data$Cell,adj=1,xpd=T,cex=1.5)
-#Õ¹Ê¾Ïà¹ØĞÔ¼ìÑéµÄpvalue
+#å±•ç¤ºç›¸å…³æ€§æ£€éªŒçš„pvalue
 pvalue.text=ifelse(data$pvalue<0.001,'<0.001',sprintf("%.03f",data$pvalue))
 redcutoff_cor=0
 redcutoff_pvalue=0.05
 text(par('usr')[2],1:nrow(data),pvalue.text,adj=0,xpd=T,col=ifelse(abs(data$cor)>redcutoff_cor & data$pvalue<redcutoff_pvalue,"red","black"),cex=1.5)
 axis(1,tick=F)
 
-#»æÖÆÔ²È¦´óĞ¡µÄÍ¼Àı
+#ç»˜åˆ¶åœ†åœˆå¤§å°çš„å›¾ä¾‹
 par(mar=c(0,4,3,4))
 plot(1,type="n",axes=F,xlab="",ylab="")
 legend("left",legend=c(0.1,0.2,0.3,0.4,0.5),col="black",pt.cex=p.cex,pch=16,bty="n",cex=2,title="abs(cor)")
 
-#»æÖÆÔ²È¦ÑÕÉ«µÄÍ¼Àı
+#ç»˜åˆ¶åœ†åœˆé¢œè‰²çš„å›¾ä¾‹
 par(mar=c(0,6,4,6),cex.axis=1.5,cex.main=2)
 barplot(rep(1,5),horiz=T,space=0,border=NA,col=p.col,xaxt="n",yaxt="n",xlab="",ylab="",main="pvalue")
 axis(4,at=0:5,c(1,0.8,0.6,0.4,0.2,0),tick=F)
 dev.off()
-
-
-######ÉúĞÅ×ÔÑ§Íø: https://www.biowolf.cn/
-######¿Î³ÌÁ´½Ó1: https://shop119322454.taobao.com
-######¿Î³ÌÁ´½Ó2: https://ke.biowolf.cn
-######¿Î³ÌÁ´½Ó3: https://ke.biowolf.cn/mobile
-######¹â¿¡ÀÏÊ¦ÓÊÏä: seqbio@foxmail.com
-######¹â¿¡ÀÏÊ¦Î¢ĞÅ: eduBio
 
 
